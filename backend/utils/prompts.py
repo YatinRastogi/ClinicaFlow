@@ -327,12 +327,16 @@ class SpecialistPrompt:
         memory_context: str,
         structured_data: str,
         conversation_history: str,
+        red_flags: str = "None detected",
+        retrieved_context: str = "No additional guidelines retrieved.",
     ):
         system_text = _build_specialist_system_text(
             self.role, self.max_turns, memory_context
         )
         human_text = (
             "Please assess and analyse the following patient record:\n\n"
+            f"**Red Flags Detected:**\n{red_flags}\n\n"
+            f"**Relevant Clinical Guidelines (RAG Context):**\n{retrieved_context}\n\n"
             f"**Structured Patient Data:**\n{structured_data}\n\n"
             f"**Patient Conversation History:**\n{conversation_history}"
         )

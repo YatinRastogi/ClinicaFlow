@@ -77,6 +77,8 @@ class PatientState(TypedDict, total=False):
     report_path: str
     analysis_history: List[Dict[str, Any]]
     report_json_path: str
+    retrieved_context: str
+    red_flags: List[str]
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +100,32 @@ def summarize_lab_report(pdf_path: str) -> Dict[str, Any]:
     summary = chain.invoke({"report_text": text}).content
     return {"summary": summary}
 
+# ---------------------------------------------------------------------------
+# RAG
+# ---------------------------------------------------------------------------
+
+def retrieve_context_node(state: PatientState) -> Dict[str, Any]:
+    print("--- 📚 RETRIEVING SPECIALTY GUIDELINES (RAG) ---")
+    specialty = state.get("diagnosis_path", "general_medicine")
+
+    # 1. Get the raw initial symptoms
+    base_symptoms = state.get("raw_input", {}).get("symptoms", "")
+
+    # 2. Extract the dynamically gathered facts from the new memory state
+    interview_state = state.get("interview_state", {})
+    known_facts = interview_state.get("known_facts", {})
+
+    # 3. Build a highly contextual query string for ChromaDB
+    # e.g., "chest pain. fever_duration: 3 days, pain_level: 7/10"
+    facts_string = ", ".join([f"{k}: {v}" for k, v in known_facts.items()])
+    enhanced_query = f"{base_symptoms}. {facts_string}"
+
+    print(f"--- 🔍 Enhanced RAG Query: {enhanced_query} ---")
+
+    # 4. Retrieve targeted docs using the enhanced query
+    context = retrieve_medical_context(enhanced_query, specialty)
+
+    return {"retrieved_context": context}
 
 # ---------------------------------------------------------------------------
 # Helper: clean JSON from LLM output
@@ -387,8 +415,14 @@ def run_specialist_analysis(
     structured_data = json.dumps(state.get("structured_input", {}), indent=2)
     conversation_history = _conversation_history_text(state.get("messages", []))
 
+    # Pull the RAG context we just saved to the state
+    retrieved_context = state.get("retrieved_context", "No additional guidelines retrieved.")
+    red_flags = "\n".join(state.get("red_flags", ["None detected"]))
+
     messages = specialist_prompt.build_messages(
         memory_context=memory_context,
+        red_flags=red_flags,
+        retrieved_context=retrieved_context,
         structured_data=structured_data,
         conversation_history=conversation_history,
     )
