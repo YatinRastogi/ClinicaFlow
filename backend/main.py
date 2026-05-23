@@ -120,8 +120,8 @@ async def chat(
             if not current_snapshot:
                 raise HTTPException(status_code=404, detail="Conversation not found.")
 
-            # With interrupt_before=["ask_one_question"], the graph is paused
-            # BEFORE ask_one_question runs. We only need to inject the human
+            # With interrupt_before=["extract_memory"], the graph is paused
+            # BEFORE extract_memory runs. We only need to inject the human
             # reply into the message history — extract_memory_node runs first
             # inside the graph on resume, so we do NOT extract here to avoid
             # double-processing.

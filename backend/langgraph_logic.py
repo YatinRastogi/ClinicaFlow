@@ -619,7 +619,7 @@ checkpointer = MemorySaver()
 
 graph_with_checkpoint = builder.compile(
     checkpointer=checkpointer,
-    # interrupt_before: graph pauses BEFORE running ask_one_question.
+    # interrupt_before: graph pauses BEFORE running extract_memory.
     # This means:
     # 1. The previous ask_one_question already ran and set pending_question.
     # 2. The API returns pending_question to the frontend.
@@ -628,7 +628,7 @@ graph_with_checkpoint = builder.compile(
     # Crucially: if ask_one_question returns pending_question=None and routes
     # to triage, there is NO interrupt — the graph runs straight through to
     # generate_report and sets is_complete=True correctly.
-    interrupt_before=["ask_one_question"],
+    interrupt_before=["extract_memory"],
 )
 
 # Non-interrupting version for testing
