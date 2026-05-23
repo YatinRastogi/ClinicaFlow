@@ -59,9 +59,9 @@ const DiagnosticHomepage = () => {
   }, []);
 
   const stats = [
-    { value: '97.3%', label: 'Diagnostic Accuracy', icon: TrendingUp },
-    { value: '45%', label: 'Faster Diagnosis', icon: Clock },
-    { value: '500+', label: 'Healthcare Facilities', icon: Users },
+    { value: 'Multi-LLM', label: 'Specialist Routing', icon: TrendingUp },
+    { value: '<2 min', label: 'Avg. Analysis Time', icon: Clock },
+    { value: '3+', label: 'Specialist Pathways', icon: Users },
     { value: '24/7', label: 'Availability', icon: Globe }
   ];
 
@@ -143,7 +143,7 @@ const DiagnosticHomepage = () => {
                   <Stethoscope className="text-white" size={24} />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-                  MedAI Diagnostics
+                  ClinicaFlow
                 </span>
               </div>
             </div>
@@ -196,16 +196,16 @@ const DiagnosticHomepage = () => {
             <div>
               <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <Award className="mr-2" size={16} />
-                FDA Approved AI Diagnostic Platform
+                AI-Powered Clinical Decision Support
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                AI-Powered
                 <span className="bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent block">
-                  Medical Diagnosis
+                  ClinicaFlow
                 </span>
+                AI-Powered Clinical Diagnostics
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Revolutionary AI diagnostic system that synthesizes patient data, symptoms, and medical records to provide accurate, explainable diagnoses in real-time. Empowering healthcare professionals with intelligent clinical decision support.
+                An AI diagnostic assistant that synthesizes patient data, symptoms, and medical records to generate preliminary clinical assessments — helping healthcare professionals gather information faster and more systematically. Always reviewed by a qualified clinician.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-indigo-800 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center">
@@ -415,7 +415,7 @@ const DiagnosticHomepage = () => {
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-lg mr-3">
                   <Stethoscope className="text-white" size={24} />
                 </div>
-                <span className="text-2xl font-bold">MedAI Diagnostics</span>
+                <span className="text-2xl font-bold">ClinicaFlow</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
                 Revolutionizing healthcare with AI-powered diagnostic tools that enhance clinical decision-making and improve patient outcomes.
@@ -455,7 +455,7 @@ const DiagnosticHomepage = () => {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 MedAI Diagnostics. All rights reserved. FDA Approved Medical Device.</p>
+            <p>&copy; 2025 ClinicaFlow. All rights reserved. For research and clinical decision support only — not a substitute for professional medical advice.</p>
           </div>
         </div>
       </footer>

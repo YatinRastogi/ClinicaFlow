@@ -1,29 +1,77 @@
-# healthAgentDoctor.py
+# langgraph_logic.py
+"""
+AI Diagnostic Assistant — LangGraph State Machine
+--------------------------------------------------
+Changes from original
+~~~~~~~~~~~~~~~~~~~~~
+- PatientState gains an `interview_state` field (the persistent memory object)
+- `initialize_chat_node` is removed; question generation is now fully dynamic
+  via `ask_one_question_node` which calls the LLM on every turn.
+- A new `extract_memory_node` runs after each human reply to update known_facts,
+  unavailable_information, embeddings, and confidence score.
+- `ask_one_question_node` uses the `next_question_prompt` to generate ONE
+  question per turn, checks for semantic duplicates, and respects MAX_TURNS.
+- All specialist nodes inject `memory_context` into their prompts.
+- `decide_if_chat_needed` and `decide_to_continue_chat` are updated accordingly.
+"""
+
 import json
 import os
-from typing import List, Dict, Any, TypedDict, cast
+import uuid
+from typing import Any, Dict, List, Optional, TypedDict, cast
 
 import fitz  # PyMuPDF
 from dotenv import load_dotenv
-from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, StateGraph
 
-# Mock imports for placeholder functions - replace with your actual files
-from utils.llm import llm, lab_report_llm, triage_llm, general_medicine_llm, cardiology_llm, dermatology_llm
+from utils.interview_memory import (
+    MAX_TURNS,
+    apply_extraction_to_state,
+    build_memory_context_block,
+    embed_text,
+    extract_memory_from_reply,
+    is_duplicate_question,
+    make_interview_state,
+    register_question,
+    should_force_terminate,
+    update_confidence,
+)
+from utils.llm import (
+    cardiology_llm,
+    dermatology_llm,
+    general_medicine_llm,
+    lab_report_llm,
+    llm,
+    triage_llm,
+)
 from utils.pdf_generator import create_pdf_report
-from utils.prompts import intake_prompt, lab_prompt, triage_router_prompt, general_medicine_prompt, cardiology_prompt, \
-    dermatology_prompt, question_refinement_prompt, medical_report_prompt
+from utils.prompts import (
+    cardiology_prompt,
+    dermatology_prompt,
+    general_medicine_prompt,
+    intake_prompt,
+    lab_prompt,
+    medical_report_prompt,
+    next_question_prompt,
+    question_refinement_prompt,
+    triage_router_prompt,
+)
 
 load_dotenv()
 
 
-# --- AGENT STATE DEFINITION ---
+# ---------------------------------------------------------------------------
+# Agent State
+# ---------------------------------------------------------------------------
+
 class PatientState(TypedDict, total=False):
     raw_input: Dict[str, Any]
     structured_input: Dict[str, Any]
     messages: List[Dict[str, Any]]
-    question_queue: List[str]
-    pending_question: str  # To hold the current question
+    # interview_state replaces question_queue + pending_question logic
+    interview_state: Dict[str, Any]
+    pending_question: Optional[str]       # surfaced to the API layer
     diagnosis_path: str
     final_analysis: Dict[str, Any]
     report_path: str
@@ -31,18 +79,18 @@ class PatientState(TypedDict, total=False):
     report_json_path: str
 
 
-# --- (All your node and utility functions remain here, unchanged) ---
+# ---------------------------------------------------------------------------
+# Utility: PDF text extraction & lab report summarisation
+# ---------------------------------------------------------------------------
+
 def extract_text_from_pdf(pdf_path: str) -> str:
     if not os.path.exists(pdf_path):
         return "File not found."
     doc = fitz.open(pdf_path)
-    text = ""
-    for page in doc:
-        text += page.get_text("text") + "\n"
-    return text.strip()
+    return "\n".join(page.get_text("text") for page in doc).strip()
 
 
-def summarize_lab_report(pdf_path):
+def summarize_lab_report(pdf_path: str) -> Dict[str, Any]:
     text = extract_text_from_pdf(pdf_path)
     if text == "File not found.":
         return {"error": "Lab report file not found."}
@@ -51,140 +99,331 @@ def summarize_lab_report(pdf_path):
     return {"summary": summary}
 
 
+# ---------------------------------------------------------------------------
+# Helper: clean JSON from LLM output
+# ---------------------------------------------------------------------------
+
+def _clean_and_parse(raw: str) -> Dict[str, Any]:
+    raw = raw.strip()
+    # Strip common markdown fences
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[-1]
+    if raw.endswith("```"):
+        raw = raw.rsplit("```", 1)[0]
+    raw = raw.strip()
+    return json.loads(raw)
+
+
+def _conversation_history_text(messages: List[Dict[str, Any]]) -> str:
+    return "\n".join(
+        f"{msg['role'].upper()}: {msg['content']}" for msg in messages
+    )
+
+
+# ---------------------------------------------------------------------------
+# Node 1: Preprocess
+# ---------------------------------------------------------------------------
+
 def preprocess_node(state: PatientState) -> Dict[str, Any]:
     print("--- 📝 PREPROCESSING INITIAL DATA ---")
     raw = state.get("raw_input", {})
     messages = state.get("messages", [])
-    messages.append({"role": "human", "content": f"Patient provided input:\n{json.dumps(raw, indent=2)}"})
+    messages.append(
+        {"role": "human", "content": f"Patient provided input:\n{json.dumps(raw, indent=2)}"}
+    )
+
+    vitals = raw.get("vitals") or {}
     chain = intake_prompt | llm
-    vitals = (raw.get("vitals") or {})
     llm_response = chain.invoke({
         "patient_data": json.dumps(raw),
         "temperature": vitals.get("temperature", ""),
         "bp": vitals.get("bp", ""),
         "pulse": vitals.get("pulse", ""),
-        "spo2": vitals.get("spo2", "")
+        "spo2": vitals.get("spo2", ""),
     })
     messages.append({"role": "ai", "content": llm_response.content})
-    cleaned_content = llm_response.content.strip().lstrip("```json").rstrip("```").strip()
+
     try:
-        structured_input = json.loads(cleaned_content)
+        structured_input = _clean_and_parse(llm_response.content)
     except Exception as e:
         structured_input = {"raw_llm_output": llm_response.content, "parsing_error": str(e)}
-    return {"structured_input": structured_input, "messages": messages}
 
+    # Initialise a fresh interview state
+    interview_state = make_interview_state()
+
+    # Pre-populate known facts from the raw vitals / symptoms
+    vitals_facts = {k: v for k, v in vitals.items() if v}
+    if vitals_facts:
+        interview_state["known_facts"]["vitals"] = vitals_facts
+    if raw.get("symptoms"):
+        interview_state["known_facts"]["initial_complaint"] = raw["symptoms"]
+
+    # If the patient uploaded no files, mark lab/health records as unavailable
+    # upfront so the LLM never wastes turns asking for them. The specialist
+    # will instead recommend what tests to get rather than requesting them.
+    files = raw.get("files", {})
+    if not files.get("lab_report"):
+        interview_state["unavailable_information"].append("lab_reports")
+    if not files.get("health_record"):
+        interview_state["unavailable_information"].append("previous_health_records")
+
+    return {
+        "structured_input": structured_input,
+        "messages": messages,
+        "interview_state": interview_state,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Node 2: Process Lab Reports
+# ---------------------------------------------------------------------------
 
 def process_all_lab_reports_node(state: PatientState) -> Dict[str, Any]:
     print("--- 📄 PROCESSING LAB REPORTS ---")
     files = state.get("raw_input", {}).get("files", {})
-    lab_results = {}
-    for report_name, file_path in files.items():
-        try:
-            lab_results[report_name] = summarize_lab_report(file_path)
-        except Exception as e:
-            lab_results[report_name] = {"error": str(e)}
+    lab_results: Dict[str, Any] = {}
+
+    if not files:
+        # No files uploaded — explicitly flag this so specialists know to
+        # recommend tests rather than wait for lab data.
+        print("--- No files uploaded. Marking lab_results as not provided. ---")
+        lab_results = {"_status": "not_provided",
+                       "_note": "Patient did not upload any lab reports or health records."}
+    else:
+        for report_name, file_path in files.items():
+            try:
+                lab_results[report_name] = summarize_lab_report(file_path)
+            except Exception as e:
+                lab_results[report_name] = {"error": str(e)}
+
     structured_input = state.get("structured_input", {}).copy()
     structured_input["lab_results"] = lab_results
+    structured_input["has_lab_data"] = bool(files)  # handy flag for prompts
     return {"structured_input": structured_input}
 
+
+# ---------------------------------------------------------------------------
+# Node 3: Refine Questions  (optional; still used if labs are present)
+# ---------------------------------------------------------------------------
 
 def refine_questions_node(state: PatientState) -> Dict[str, Any]:
     print("--- 🧠 REFINING QUESTIONS BASED ON LABS ---")
     structured_input = state.get("structured_input", {})
     initial_questions = structured_input.get("missing_information", [])
     lab_summary = structured_input.get("lab_results", {})
+    interview_state = state.get("interview_state", make_interview_state())
+
     if not lab_summary or not initial_questions:
         print("--- No labs or initial questions to refine. Skipping. ---")
         return {}
+
+    memory_context = build_memory_context_block(interview_state)
     chain = question_refinement_prompt | llm
-    llm_response = chain.invoke(
-        {"initial_questions": json.dumps(initial_questions), "lab_summary": json.dumps(lab_summary)})
+    llm_response = chain.invoke({
+        "initial_questions": json.dumps(initial_questions),
+        "lab_summary": json.dumps(lab_summary),
+        "memory_context": memory_context,
+    })
     try:
-        response_json = json.loads(llm_response.content)
-        refined_questions = response_json.get("refined_questions", initial_questions)
-        updated_structured_input = structured_input.copy()
-        updated_structured_input["missing_information"] = refined_questions
-        print(f"--- Questions refined. New question count: {len(refined_questions)} ---")
-        return {"structured_input": updated_structured_input}
+        response_json = _clean_and_parse(llm_response.content)
+        refined = response_json.get("refined_questions", initial_questions)
+        updated = structured_input.copy()
+        updated["missing_information"] = refined
+        print(f"--- Questions refined. Count: {len(refined)} ---")
+        return {"structured_input": updated}
     except Exception as e:
-        print(f"--- ERROR: Failed to parse refined questions. Keeping original questions. Error: {e} ---")
+        print(f"--- ERROR: Failed to parse refined questions ({e}). Keeping originals. ---")
         return {}
 
 
-def initialize_chat_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 💬 INITIALIZING CONVERSATION ---")
-    if "final_analysis" in state:
-        specialist_name = state.get("diagnosis_path", "Specialist").capitalize()
-        print(f"\n--- 🩺 The {specialist_name} requires more information... ---")
-    questions = state.get("structured_input", {}).get("missing_information", [])
-    return {"question_queue": questions}
+# ---------------------------------------------------------------------------
+# Node 4: Extract Memory from the latest human reply
+# ---------------------------------------------------------------------------
 
+def extract_memory_node(state: PatientState) -> Dict[str, Any]:
+    """
+    Run after each human reply.  Extracts facts / unavailable items and
+    updates interview_state.  Also deduplicates against existing knowledge.
+    """
+    print("--- 🧠 EXTRACTING MEMORY FROM REPLY ---")
+    messages = state.get("messages", [])
+    interview_state = state.get("interview_state", make_interview_state()).copy()
+
+    # Find the most recent human message and the AI question that preceded it
+    last_human = next(
+        (m["content"] for m in reversed(messages) if m["role"] == "human"),
+        "",
+    )
+    last_ai_question = next(
+        (m["content"] for m in reversed(messages) if m["role"] == "ai"),
+        "",
+    )
+
+    if not last_human:
+        return {}
+
+    extracted = extract_memory_from_reply(
+        question=last_ai_question,
+        reply=last_human,
+        llm=llm,
+    )
+    interview_state = apply_extraction_to_state(extracted, interview_state)
+    interview_state = update_confidence(interview_state)
+
+    print(
+        f"--- Memory updated. Facts: {len(interview_state['known_facts'])}, "
+        f"Unavailable: {len(interview_state['unavailable_information'])}, "
+        f"Confidence: {interview_state['confidence_score']:.0%} ---"
+    )
+    return {"interview_state": interview_state}
+
+
+# ---------------------------------------------------------------------------
+# Node 5: Ask One Question  (LLM-driven, dedup-aware)
+# ---------------------------------------------------------------------------
 
 def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
-    question_queue = state.get("question_queue", [])
-    if not question_queue:
-        return {"pending_question": None}  # Ensure pending is cleared if no questions
+    """
+    Ask the next question by calling the LLM with the next_question_prompt.
 
-    # Pop the next question from the queue
-    next_question = question_queue.pop(0)
-
-    print(f"\n--- ❓ ASKING (API Mode): {next_question} ---")
-
-    # Get current messages and append the AI's question
+    - Injects full memory context so the LLM knows what's been asked / unavailable.
+    - Checks the LLM's own "status" field to see if it wants to continue.
+    - Falls back to semantic dedup to catch cases where the LLM still repeats.
+    - Clears pending_question and returns None if interview should end.
+    """
+    print("--- ❓ GENERATING NEXT QUESTION ---")
     messages = state.get("messages", [])
-    messages.append({"role": "ai", "content": next_question})
+    structured_input = state.get("structured_input", {})
+    interview_state = state.get("interview_state", make_interview_state()).copy()
 
+    # Hard safety net
+    if should_force_terminate(interview_state):
+        print("--- MAX_TURNS reached. Forcing termination. ---")
+        return {"pending_question": None, "interview_state": interview_state}
+
+    memory_context = build_memory_context_block(interview_state)
+    conversation_history = _conversation_history_text(messages)
+
+    chain = next_question_prompt | llm
+    llm_response = chain.invoke({
+        "memory_context": memory_context,
+        "structured_data": json.dumps(structured_input, indent=2),
+        "conversation_history": conversation_history,
+    })
+
+    try:
+        response_json = _clean_and_parse(llm_response.content)
+    except Exception as e:
+        print(f"--- ERROR parsing next_question response: {e}. Ending interview. ---")
+        return {"pending_question": None, "interview_state": interview_state}
+
+    if response_json.get("status") == "sufficient":
+        print("--- LLM declared interview sufficient. ---")
+        return {"pending_question": None, "interview_state": interview_state}
+
+    question = response_json.get("question", "").strip()
+    if not question:
+        print("--- No question returned. Ending interview. ---")
+        return {"pending_question": None, "interview_state": interview_state}
+
+    # Semantic dedup guard (in case the LLM ignored the memory context)
+    is_dup, sim = is_duplicate_question(question, interview_state)
+    if is_dup:
+        print(f"--- Duplicate question suppressed (similarity={sim:.2f}). Ending interview. ---")
+        return {"pending_question": None, "interview_state": interview_state}
+
+    # Register the question in memory
+    interview_state = register_question(question, interview_state)
+
+    # Append to message history
+    messages = list(messages)  # copy to avoid mutating shared state
+    messages.append({"role": "ai", "content": question})
+
+    print(f"--- ❓ ASKING: {question} ---")
     return {
-        "question_queue": question_queue,  # The updated queue (one item less)
-        "messages": messages,  # The updated message history
-        "pending_question": next_question  # The question we just asked
+        "pending_question": question,
+        "messages": messages,
+        "interview_state": interview_state,
     }
 
 
+# ---------------------------------------------------------------------------
+# Node 6: Triage Router
+# ---------------------------------------------------------------------------
+
 def triage_router_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 📧 Triage Router ---")
-    initial_status = {"status": "pending", "condition": "Waiting for AI Specialist Analysis...", "confidence": 0,
-                      "reasoning": "The system is routing the case to the appropriate specialist.", "evidence": [],
-                      "urgency": "low"}
-    analysis_history = [initial_status]
+    print("--- 📧 TRIAGE ROUTER ---")
+    initial_status = {
+        "status": "pending",
+        "condition": "Waiting for AI Specialist Analysis...",
+        "confidence": 0,
+        "reasoning": "The system is routing the case to the appropriate specialist.",
+        "evidence": [],
+        "urgency": "low",
+    }
     primary_complaint = state.get("raw_input", {}).get("symptoms", "")
     chain = triage_router_prompt | triage_llm
     llm_response = chain.invoke({"primary_complaint": primary_complaint})
     try:
-        route_json = json.loads(llm_response.content)
+        route_json = _clean_and_parse(llm_response.content)
         department = route_json.get("department", "general_medicine")
-        print(f"--- Triage Router: Routing to {department} ---")
-        return {"diagnosis_path": department, "analysis_history": analysis_history}
     except Exception:
-        print("--- Triage Router: Defaulting to general_medicine due to parsing error ---")
-        return {"diagnosis_path": "general_medicine", "analysis_history": analysis_history}
+        department = "general_medicine"
+    print(f"--- Routing to {department} ---")
+    return {"diagnosis_path": department, "analysis_history": [initial_status]}
 
 
-def run_specialist_analysis(state: PatientState, specialist_prompt, specialist_llm) -> Dict[str, Any]:
+# ---------------------------------------------------------------------------
+# Node 7: Specialist Analysis  (memory-aware)
+# ---------------------------------------------------------------------------
+
+def run_specialist_analysis(
+    state: PatientState,
+    specialist_prompt,
+    specialist_llm,
+) -> Dict[str, Any]:
+    interview_state = state.get("interview_state", make_interview_state())
+    memory_context = build_memory_context_block(interview_state)
     structured_data = json.dumps(state.get("structured_input", {}), indent=2)
-    conversation_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in state.get("messages", [])])
-    chain = specialist_prompt | specialist_llm
-    llm_response = chain.invoke({"structured_data": structured_data, "conversation_history": conversation_history})
-    cleaned_content = llm_response.content.strip().lstrip("```json").rstrip("```").strip()
+    conversation_history = _conversation_history_text(state.get("messages", []))
+
+    messages = specialist_prompt.build_messages(
+        memory_context=memory_context,
+        structured_data=structured_data,
+        conversation_history=conversation_history,
+    )
+    llm_response = specialist_llm.invoke(messages)
+
     try:
-        response_json = json.loads(cleaned_content)
-        analysis_history = state.get("analysis_history", []).copy()
-        analysis_history.append(response_json)
-        updates = {"final_analysis": response_json, "analysis_history": analysis_history}
-        if response_json.get("status") == "incomplete":
-            print("--- 🩺 SPECIALIST REQUIRES MORE INFORMATION ---")
-            updated_structured_input = state.get("structured_input", {}).copy()
-            updated_structured_input["missing_information"] = response_json.get("missing_information", [])
-            updates["structured_input"] = updated_structured_input
-        else:
-            print("--- ✅ ANALYSIS COMPLETE ---")
-        return updates
+        response_json = _clean_and_parse(llm_response.content)
     except Exception as e:
         print(f"--- ERROR in specialist analysis: {e} ---")
-        error_analysis = {"error": "Failed to parse analysis.", "raw_output": llm_response.content}
-        analysis_history = state.get("analysis_history", []).copy()
-        analysis_history.append(error_analysis)
-        return {"final_analysis": error_analysis, "analysis_history": analysis_history}
+        response_json = {"error": "Failed to parse analysis.", "raw_output": llm_response.content}
+
+    analysis_history = list(state.get("analysis_history", []))
+    analysis_history.append(response_json)
+    updates: Dict[str, Any] = {
+        "final_analysis": response_json,
+        "analysis_history": analysis_history,
+    }
+
+    if response_json.get("status") == "incomplete":
+        print("--- 🩺 SPECIALIST REQUIRES MORE INFORMATION ---")
+        updated_structured = state.get("structured_input", {}).copy()
+        updated_structured["missing_information"] = response_json.get("missing_information", [])
+        updates["structured_input"] = updated_structured
+
+        # Update interview_state stage so it doesn't loop forever
+        updated_interview = interview_state.copy()
+        updated_interview = update_confidence(updated_interview, specialist_status="incomplete")
+        updates["interview_state"] = updated_interview
+    else:
+        print("--- ✅ SPECIALIST ANALYSIS COMPLETE ---")
+        updated_interview = interview_state.copy()
+        updated_interview = update_confidence(updated_interview, specialist_status="complete")
+        updates["interview_state"] = updated_interview
+
+    return updates
 
 
 def general_medicine_analysis_node(state: PatientState) -> Dict[str, Any]:
@@ -201,59 +440,74 @@ def dermatology_analysis_node(state: PatientState) -> Dict[str, Any]:
     print("--- 🩺 DERMATOLOGY ANALYSIS ---")
     return run_specialist_analysis(state, dermatology_prompt, dermatology_llm)
 
-def generate_report_node(state: PatientState) -> Dict[str, str]:
-    print("--- ✍️ Generating final clinician report... ---")
 
-    # 1. This part is the same: gather the data from the state
+# ---------------------------------------------------------------------------
+# Node 8: Generate Report
+# ---------------------------------------------------------------------------
+
+def generate_report_node(state: PatientState) -> Dict[str, str]:
+    print("--- ✍️ GENERATING FINAL CLINICIAN REPORT ---")
+    structured_input = state.get("structured_input", {})
+    has_lab_data = structured_input.get("has_lab_data", False)
     report_data = {
         "raw_input": state.get("raw_input"),
         "final_analysis": state.get("final_analysis", {}),
-        "lab_results": state.get("structured_input", {}).get("lab_results")
+        "lab_results": structured_input.get("lab_results"),
+        "has_lab_data": has_lab_data,
+        "interview_summary": {
+            "known_facts": state.get("interview_state", {}).get("known_facts", {}),
+            "unavailable_information": state.get("interview_state", {}).get("unavailable_information", []),
+            "total_turns": state.get("interview_state", {}).get("turn_count", 0),
+            "final_confidence": state.get("interview_state", {}).get("confidence_score", 0.0),
+        },
     }
 
-    # Create directory if it doesn't exist
     os.makedirs("generated_reports", exist_ok=True)
-    import uuid
     report_id = str(uuid.uuid4())
     base_path = f"generated_reports/summary_{report_id}.pdf"
     json_file_path = f"generated_reports/summary_{report_id}.json"
 
-    with open(json_file_path, 'w', encoding='utf-8') as f:
+    with open(json_file_path, "w", encoding="utf-8") as f:
         json.dump(report_data, f, ensure_ascii=False, indent=4)
-    print(f"--- 💾 Final data saved to {json_file_path} ---")
+    print(f"--- 💾 Report data saved to {json_file_path} ---")
 
-    # 3. The original PDF generation logic continues as before
     final_json_data = json.dumps(report_data, indent=2)
-    print('final_json_data = ', final_json_data)
     report_chain = medical_report_prompt | llm
     markdown_report = report_chain.invoke({"final_json_data": final_json_data}).content
     final_pdf_path = create_pdf_report(markdown_report, filename=base_path)
 
-    # 4. Return paths to BOTH files
     return {
         "report_path": final_pdf_path,
-        "report_json_path": json_file_path
+        "report_json_path": json_file_path,
     }
 
 
+# ---------------------------------------------------------------------------
+# Conditional edge functions
+# ---------------------------------------------------------------------------
+
 def decide_if_chat_needed(state: PatientState) -> str:
-    print("--- 🤔 CHAT NEEDED? ---")
-    if state.get("structured_input", {}).get("missing_information"):
-        print("--- ROUTING TO: initialize_chat ---")
-        return "start_chat"
-    else:
-        print("--- ROUTING TO: triage_router (No chat needed) ---")
-        return "no_chat_needed"
+    """
+    Always start the dynamic interview — ask_one_question_node uses the LLM
+    to decide when enough information has been gathered (status: "sufficient").
+    We no longer gate on missing_information because that list only reflects
+    what the intake prompt flagged; the dynamic interviewer may surface more.
+    """
+    print("--- 🤔 CHAT NEEDED? Always yes — starting dynamic interview. ---")
+    return "start_chat"
 
 
 def decide_to_continue_chat(state: PatientState) -> str:
+    """
+    After ask_one_question: continue if a pending_question was set,
+    otherwise move to triage.
+    """
     print("--- 🤔 CONTINUE CHAT? ---")
-    if state.get("question_queue"):
-        print("--- ROUTING TO: ask_one_question (More questions remain) ---")
+    if state.get("pending_question"):
+        print("--- ROUTING TO: interrupt (waiting for human reply) ---")
         return "continue_chat"
-    else:
-        print("--- ROUTING TO: triage_router (All questions asked) ---")
-        return "end_chat"
+    print("--- ROUTING TO: triage_router ---")
+    return "end_chat"
 
 
 def route_to_specialist(state: PatientState) -> str:
@@ -261,101 +515,121 @@ def route_to_specialist(state: PatientState) -> str:
 
 
 def decide_after_analysis(state: PatientState) -> str:
-    print("--- 🤔 REVIEWING SPECIALIST'S ANALYSIS ---")
+    """
+    After specialist: loop back for more questions only if:
+    - status == "incomplete"
+    - AND we have new missing_information
+    - AND we haven't hit MAX_TURNS
+    """
+    print("--- 🤔 REVIEWING SPECIALIST ANALYSIS ---")
+    interview_state = state.get("interview_state", {})
     final_analysis = state.get("final_analysis", {})
     status = final_analysis.get("status", "complete")
-    if status == "incomplete" and final_analysis.get("missing_information"):
-        print("--- ROUTING TO: initialize_chat (Specialist has more questions) ---")
+    turn_count = interview_state.get("turn_count", 0)
+
+    if (
+        status == "incomplete"
+        and final_analysis.get("missing_information")
+        and turn_count < MAX_TURNS
+    ):
+        print("--- ROUTING TO: ask_one_question (specialist needs more info) ---")
         return "ask_more_questions"
-    else:
-        print("--- ROUTING TO: generate_report (Analysis is complete) ---")
-        return "end_process"
+
+    print("--- ROUTING TO: generate_report ---")
+    return "end_process"
 
 
-# --- BUILD AND COMPILE THE LANGGRAPH STATE MACHINE ---
+# ---------------------------------------------------------------------------
+# Build and compile the LangGraph state machine
+# ---------------------------------------------------------------------------
+
 builder = StateGraph(PatientState)
 
-builder.add_node("preprocess", preprocess_node)
-builder.add_node("process_lab_reports", process_all_lab_reports_node)
-builder.add_node("refine_questions", refine_questions_node)
-builder.add_node("initialize_chat", initialize_chat_node)
-builder.add_node("ask_one_question", ask_one_question_node)
-builder.add_node("triage_router", triage_router_node)
-builder.add_node("general_medicine_analysis", general_medicine_analysis_node)
-builder.add_node("cardiology_analysis", cardiology_analysis_node)
-builder.add_node("dermatology_analysis", dermatology_analysis_node)
-builder.add_node("generate_report", generate_report_node)
+# Register nodes
+builder.add_node("preprocess",                  preprocess_node)
+builder.add_node("process_lab_reports",         process_all_lab_reports_node)
+builder.add_node("refine_questions",            refine_questions_node)
+builder.add_node("extract_memory",              extract_memory_node)
+builder.add_node("ask_one_question",            ask_one_question_node)
+builder.add_node("triage_router",               triage_router_node)
+builder.add_node("general_medicine_analysis",   general_medicine_analysis_node)
+builder.add_node("cardiology_analysis",         cardiology_analysis_node)
+builder.add_node("dermatology_analysis",        dermatology_analysis_node)
+builder.add_node("generate_report",             generate_report_node)
 
+# Entry point
 builder.set_entry_point("preprocess")
-builder.add_edge("preprocess", "process_lab_reports")
+
+# Fixed edges
+builder.add_edge("preprocess",          "process_lab_reports")
 builder.add_edge("process_lab_reports", "refine_questions")
 
-builder.add_conditional_edges("refine_questions", decide_if_chat_needed,
-                              {"start_chat": "initialize_chat", "no_chat_needed": "triage_router"})
-builder.add_edge("initialize_chat", "ask_one_question")
-builder.add_conditional_edges("ask_one_question", decide_to_continue_chat,
-                              {"continue_chat": "ask_one_question", "end_chat": "triage_router"})
-builder.add_conditional_edges("triage_router", route_to_specialist,
-                              {"general_medicine": "general_medicine_analysis", "cardiology": "cardiology_analysis",
-                               "dermatology": "dermatology_analysis"})
+# After refine: start interview or go straight to triage
+builder.add_conditional_edges(
+    "refine_questions",
+    decide_if_chat_needed,
+    {"start_chat": "ask_one_question", "no_chat_needed": "triage_router"},
+)
 
+# After human reply comes in: extract_memory → ask_one_question
+# (The graph resumes here on continuation calls from the API)
+builder.add_edge("extract_memory", "ask_one_question")
 
-def add_specialist_edges(specialist_name):
-    builder.add_conditional_edges(specialist_name, decide_after_analysis,
-                                  {"ask_more_questions": "initialize_chat", "end_process": "generate_report"})
+# After ask_one_question:
+# - 'continue_chat' → extract_memory (graph will be interrupted BEFORE the
+#   next ask_one_question call via interrupt_before, giving the API a chance
+#   to inject the human reply first)
+# - 'end_chat'      → triage_router (interview finished, no interrupt)
+builder.add_conditional_edges(
+    "ask_one_question",
+    decide_to_continue_chat,
+    {"continue_chat": "extract_memory", "end_chat": "triage_router"},
+)
 
+# Triage routes to specialist
+builder.add_conditional_edges(
+    "triage_router",
+    route_to_specialist,
+    {
+        "general_medicine": "general_medicine_analysis",
+        "cardiology":       "cardiology_analysis",
+        "dermatology":      "dermatology_analysis",
+    },
+)
 
-add_specialist_edges("general_medicine_analysis")
-add_specialist_edges("cardiology_analysis")
-add_specialist_edges("dermatology_analysis")
+# Specialist decides: more questions or generate report
+def _add_specialist_edges(name: str) -> None:
+    builder.add_conditional_edges(
+        name,
+        decide_after_analysis,
+        {"ask_more_questions": "ask_one_question", "end_process": "generate_report"},
+    )
+
+_add_specialist_edges("general_medicine_analysis")
+_add_specialist_edges("cardiology_analysis")
+_add_specialist_edges("dermatology_analysis")
 
 builder.add_edge("generate_report", END)
 
-# --- COMPILE THE GRAPH WITH CHECKPOINTER AND INTERRUPT ---
+# ---------------------------------------------------------------------------
+# Compile with checkpoint + interrupt
+# ---------------------------------------------------------------------------
+
 checkpointer = MemorySaver()
 
-# ✅ FIX: Tell the graph to pause after asking a question.
-# This prevents the recursion error by stopping the graph's execution
-# and waiting for the next user input.
 graph_with_checkpoint = builder.compile(
     checkpointer=checkpointer,
-    interrupt_after=["ask_one_question"]
+    # interrupt_before: graph pauses BEFORE running ask_one_question.
+    # This means:
+    # 1. The previous ask_one_question already ran and set pending_question.
+    # 2. The API returns pending_question to the frontend.
+    # 3. When the human replies, main.py injects the answer and resumes.
+    # 4. The graph runs extract_memory → ask_one_question with fresh state.
+    # Crucially: if ask_one_question returns pending_question=None and routes
+    # to triage, there is NO interrupt — the graph runs straight through to
+    # generate_report and sets is_complete=True correctly.
+    interrupt_before=["ask_one_question"],
 )
 
-# Keep a non-interrupting version for testing if needed
+# Non-interrupting version for testing
 graph = builder.compile(checkpointer=checkpointer)
-
-# --- MAIN EXECUTION BLOCK ---
-if __name__ == "__main__":
-    print("--- 🚀 Starting AI Diagnostic Agent ---")
-
-    try:
-        with open("diagnostic_agent_graph.png", "wb") as f:
-            f.write(graph.get_graph().draw_mermaid_png())
-        print("--- 📊 Graph visualization saved to diagnostic_agent_graph.png ---")
-    except Exception as e:
-        print(f"--- ⚠️ Could not generate graph visualization: {e} ---")
-        print("--- (This may require installing 'pygraphviz' and system-level 'graphviz') ---")
-
-    # Example test run
-    raw_input_data = {
-        "Name": "Sarab", "age": 28,
-        "symptoms": "Have an itchy red rash on my arm for three days, and I've had a fever.",
-        "vitals": {"temperature": "101.5 F", "bp": "110/70"}, "files": {}
-    }
-
-    config = {"configurable": {"thread_id": "test-thread-1"}}
-
-    # Run and print state at each step
-    for step in graph_with_checkpoint.stream({"raw_input": raw_input_data}, config):
-        print("\n" + "=" * 30)
-        print(list(step.keys())[0])
-        print(list(step.values())[0])
-        print("=" * 30 + "\n")
-
-    # Example follow-up
-    for step in graph_with_checkpoint.stream(None, config):
-        print("\n" + "=" * 30)
-        print(list(step.keys())[0])
-        print(list(step.values())[0])
-        print("=" * 30 + "\n")
