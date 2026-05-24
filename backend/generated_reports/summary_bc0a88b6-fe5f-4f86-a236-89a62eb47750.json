@@ -1,0 +1,126 @@
+{
+    "raw_input": {
+        "weight": 65,
+        "symptoms": "stomach pain and diarhia",
+        "duration": "1 24 hours",
+        "vitals": {
+            "temperature": "98.4",
+            "bp": "120/82",
+            "pulse": "68",
+            "spo2": "85"
+        },
+        "files": {
+            "lab_report": "temp_uploads\\502ce29b-b328-4d27-a567-aca807eb30eb_blood_test_report.pdf"
+        }
+    },
+    "patient_profile": {
+        "name": "Ashley Grahm",
+        "age": 20,
+        "gender": "female",
+        "blood_group": "A+",
+        "family_history": "None",
+        "pre_existing_conditions": "None"
+    },
+    "final_analysis": {
+        "status": "complete",
+        "analysis": {
+            "probable_diagnosis": {
+                "condition": "Acute infectious gastroenteritis with dehydration and secondary hypoxemia (possible early sepsis)",
+                "confidence": 78,
+                "reasoning": "The patient presents with severe abdominal pain and diarrhea of <24 h duration after eating a pizza (potential food‑borne exposure). Laboratory data show mild leukocytosis (WBC 10,570) indicating an inflammatory/infectious process. Vital signs reveal normal temperature and blood pressure but a critically low SpO₂ (85 %) and orthostatic dizziness, suggesting hypoxemia likely secondary to dehydration and/or early systemic inflammatory response. The presence of hyperglycemia (fasting glucose 141 mg/dL) and HbA1c 7.1 % points to previously undiagnosed diabetes, which can exacerbate infection severity. No fever, chest pain, or overt respiratory symptoms are reported, making primary pulmonary pathology less likely.",
+                "evidence": [
+                    "Abdominal pain and diarrhea started this morning after pizza consumption",
+                    "WBC 10,570 (high)",
+                    "SpO₂ 85 % (hypoxia)",
+                    "Orthostatic dizziness, weakness, inability to swallow comfortably",
+                    "Fasting glucose 141 mg/dL and HbA1c 7.1 % (new‑onset diabetes)",
+                    "No documented fever, tachycardia, or hypertension"
+                ],
+                "urgency": "High"
+            },
+            "differential_diagnosis": [
+                {
+                    "condition": "Food‑borne bacterial gastroenteritis (e.g., Salmonella, Campylobacter, Staphylococcus aureus)",
+                    "reasoning": "Recent ingestion of pizza from a local shop, acute onset, leukocytosis."
+                },
+                {
+                    "condition": "Early sepsis secondary to gastrointestinal infection",
+                    "reasoning": "Hypoxemia, leukocytosis, dizziness, and possible inadequate perfusion."
+                },
+                {
+                    "condition": "Dehydration with orthostatic hypotension",
+                    "reasoning": "Dizziness on standing, low SpO₂, inability to retain fluids."
+                },
+                {
+                    "condition": "Undiagnosed type 2 diabetes mellitus presenting with hyperglycemia and infection",
+                    "reasoning": "Elevated fasting glucose and HbA₁c."
+                },
+                {
+                    "condition": "COVID‑19 or other viral respiratory infection presenting atypically",
+                    "reasoning": "Low SpO₂ without respiratory complaints warrants exclusion."
+                },
+                {
+                    "condition": "Allergic reaction / atopic disease (high IgE)",
+                    "reasoning": "IgE markedly elevated; however, no rash or airway symptoms reported."
+                }
+            ],
+            "recommended_tests": [
+                "CBC with differential",
+                "Comprehensive metabolic panel (electrolytes, renal function, liver enzymes)",
+                "Serum lactate",
+                "Arterial blood gas with pulse oximetry",
+                "Blood cultures (2 sets)",
+                "Stool culture, ova & parasites, and Clostridioides difficile toxin PCR",
+                "Rapid COVID‑19 PCR or antigen test",
+                "Chest X‑ray (to evaluate for pneumonia or other pulmonary cause of hypoxia)",
+                "Abdominal ultrasound (to assess for appendicitis, intra‑abdominal abscess, or hepatosplenomegaly)",
+                "Urinalysis and urine culture (to assess for dehydration and possible urinary infection)",
+                "Serum ketones (beta‑hydroxybutyrate) given new‑onset hyperglycemia",
+                "ECG (baseline, given electrolyte shifts and hypoxia)",
+                "Serum vitamin B12, 25‑OH vitamin D, homocysteine (already known, repeat if needed)",
+                "Allergy panel or serum tryptase if allergic reaction suspected"
+            ],
+            "suggested_medications": [
+                "IV isotonic crystalloid fluids (e.g., normal saline 1‑2 L bolus, then maintenance) for rehydration",
+                "Oral rehydration solution if tolerated",
+                "Antiemetic (e.g., ondansetron 4 mg IV/PO q8h PRN)",
+                "Empiric broad‑spectrum antibiotic (e.g., ciprofloxacin 500 mg PO BID) if bacterial gastroenteritis is strongly suspected or patient becomes febrile",
+                "Supplemental oxygen to maintain SpO₂ > 94 % (via nasal cannula or mask)",
+                "If blood glucose remains >180 mg/dL, consider short‑acting insulin per sliding scale",
+                "Vitamin B12 replacement (e.g., cyanocobalamin 1000 µg IM weekly) after stabilization",
+                "Vitamin D supplementation (e.g., cholecalciferol 2000 IU daily) after correction of acute issues"
+            ],
+            "medication_disclaimer": "A qualified human doctor must make the final prescribing decision.",
+            "information_gaps": [
+                "Allergy history (drug, food, environmental) – not yet provided.",
+                "Current medication/supplement list – unknown.",
+                "Exact volume of oral intake and urine output over the past 24 h.",
+                "Presence or absence of blood/mucus in stool.",
+                "Any shortness of breath, chest discomfort, or cough that may explain hypoxia.",
+                "Recent travel or known sick contacts beyond the pizza exposure."
+            ]
+        }
+    },
+    "lab_results": {
+        "lab_report": {
+            "summary": "```json\n{\n  \"abnormal_findings\": [\n    {\n      \"parameter\": \"WBC Count\",\n      \"value\": \"10570\",\n      \"standard_range\": \"4000-10000\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Fasting Blood Sugar\",\n      \"value\": \"141.0\",\n      \"standard_range\": \"74-106\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"HbA1c\",\n      \"value\": \"7.10\",\n      \"standard_range\": \"< 5.7 (Non-Diabetes), 5.7-6.4 (Pre-Diabetes), >6.5 (Diabetes)\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Vitamin B12\",\n      \"value\": \"< 148\",\n      \"standard_range\": \"187-833\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Homocysteine\",\n      \"value\": \"23.86\",\n      \"standard_range\": \"6.0-14.8\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"IgE\",\n      \"value\": \"492.30\",\n      \"standard_range\": \"0-87\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"25(OH) Vitamin D\",\n      \"value\": \"8.98\",\n      \"standard_range\": \"30-100\",\n      \"interpretation\": \"Low\"\n    }\n  ],\n  \"concerns\": [\n    \"Potential diabetes or pre-diabetes due to elevated Fasting Blood Sugar and HbA1c levels\",\n    \"Vitamin B12 deficiency, which may cause neurological issues or anemia\",\n    \"Elevated homocysteine levels, which may indicate cardiovascular risk\",\n    \"Possible allergic reactions or atopic diseases due to high IgE levels\",\n    \"Vitamin D deficiency, which may affect bone health\"\n  ]\n}\n```"
+        }
+    },
+    "has_lab_data": true,
+    "interview_summary": {
+        "known_facts": {
+            "vitals": {
+                "temperature": "98.4",
+                "bp": "120/82",
+                "pulse": "68",
+                "spo2": "85"
+            },
+            "initial_complaint": "stomach pain and diarhia"
+        },
+        "unavailable_information": [
+            "previous_health_records"
+        ],
+        "total_turns": 0,
+        "final_confidence": 0.5
+    }
+}

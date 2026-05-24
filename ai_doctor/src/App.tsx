@@ -167,7 +167,7 @@ const PatientInputForm = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Thermometer className="inline mr-2" size={16} />Temperature (°C)
+              <Thermometer className="inline mr-2" size={16} />Temperature (°F)
             </label>
             <input type="number" step="0.1" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="98.6" value={vitals.temperature} onChange={(e) => setVitals(prev => ({ ...prev, temperature: e.target.value }))} />
           </div>
