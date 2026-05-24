@@ -437,7 +437,7 @@ def _plain_english_section(markdown_text: str, styles: dict) -> List:
         conf = confidence_m.group(1).strip() if confidence_m else "?"
         story.append(_para(
             f"Based on your symptoms, the AI's best assessment is <b>{cond}</b> "
-            f"(confidence: {conf}%). This is a preliminary finding — a doctor still "
+            "This is a preliminary finding — a doctor still "
             "needs to examine you and review any tests before a final diagnosis is made.",
             S["plain_body"],
         ))
