@@ -1,1 +1,19 @@
-*.env
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Databases
+*.db
+
+# Chroma vector DB
+backend/chroma_db/
+
+# Generated files
+backend/generated_reports/
+backend/temp_uploads/
+
+# IDE
+.idea/
