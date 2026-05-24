@@ -1,0 +1,124 @@
+{
+    "raw_input": {
+        "weight": 65,
+        "symptoms": "headache and fever",
+        "duration": "1 24 hours",
+        "vitals": {
+            "temperature": "100.7",
+            "bp": "125/74",
+            "pulse": "67",
+            "spo2": "98"
+        },
+        "files": {
+            "lab_report": "temp_uploads\\60319695-c0c7-42db-8953-e5691d2d5892_blood_test_report.pdf"
+        }
+    },
+    "patient_profile": {
+        "name": "Ashley Grahm",
+        "age": 20,
+        "gender": "female",
+        "blood_group": "A+",
+        "family_history": "None",
+        "pre_existing_conditions": "None"
+    },
+    "final_analysis": {
+        "status": "complete",
+        "analysis": {
+            "probable_diagnosis": {
+                "condition": "Acute viral febrile illness (e.g., influenza‑like illness) presenting with headache, nausea, mild leukocytosis and low‑grade fever",
+                "confidence": 78,
+                "reasoning": "The patient is a young, otherwise healthy adult with a 24‑hour history of fever (100.7°F), headache, nausea, joint stiffness and generalized weakness. Vitals are stable (normotensive, normal pulse, normal SpO2). Laboratory data show a mild leukocytosis (WBC 10,570) which can be seen in early viral infections as well as mild bacterial infections. The absence of meningeal signs (no photophobia, no neck stiffness), rash, tachycardia, hypotension, or respiratory symptoms makes meningitis, sepsis, or severe bacterial pneumonia unlikely at this stage. The most parsimonious explanation is a self‑limited viral syndrome (influenza‑like illness). The incidental metabolic abnormalities (new‑onset hyperglycemia/HbA1c, vitamin B12 deficiency, vitamin D deficiency, dyslipidemia) are important but do not explain the acute fever.",
+                "evidence": [
+                    "Fever 100.7°F, duration ~24 h",
+                    "Headache and nausea",
+                    "Mild leukocytosis (10,570 cells/µL)",
+                    "Stable vital signs (BP 125/74, pulse 67, SpO2 98%)",
+                    "No photophobia, neck stiffness, rash, or respiratory distress"
+                ],
+                "urgency": "Medium"
+            },
+            "differential_diagnosis": [
+                {
+                    "condition": "Influenza or other viral respiratory infection",
+                    "reasoning": "Typical presentation with fever, headache, myalgias/joint stiffness, nausea; mild leukocytosis can be present."
+                },
+                {
+                    "condition": "COVID‑19 infection",
+                    "reasoning": "Overlap of symptoms; must be ruled out given pandemic context."
+                },
+                {
+                    "condition": "Acute bacterial sinusitis or upper respiratory bacterial infection",
+                    "reasoning": "Can cause fever and headache; would usually have sinus tenderness or purulent nasal discharge, which are not reported."
+                },
+                {
+                    "condition": "Early meningitis (viral or bacterial)",
+                    "reasoning": "Headache and fever raise concern, but lack of neck stiffness, photophobia, altered mental status, and normal vitals make this less likely."
+                },
+                {
+                    "condition": "Undiagnosed type 2 diabetes mellitus (newly identified)",
+                    "reasoning": "Elevated fasting glucose (141 mg/dL) and HbA1c (7.1 %) indicate diabetes, which may contribute to susceptibility to infection."
+                },
+                {
+                    "condition": "Vitamin B12 deficiency‑related fatigue",
+                    "reasoning": "Low B12 (<148 pg/mL) can cause weakness and neurological symptoms, but does not cause fever."
+                }
+            ],
+            "recommended_tests": [
+                "Rapid influenza antigen test or PCR",
+                "SARS‑CoV‑2 PCR or rapid antigen test",
+                "Complete blood count with differential (repeat if symptoms evolve)",
+                "C‑reactive protein (CRP) and erythrocyte sedimentation rate (ESR) to assess inflammatory burden",
+                "Comprehensive metabolic panel (electrolytes, renal function, liver enzymes)",
+                "Urinalysis and urine culture (to rule out urinary source of infection)",
+                "Chest X‑ray (if cough or respiratory symptoms develop)",
+                "Blood cultures (if fever persists >48 h or clinical deterioration)",
+                "Repeat fasting glucose and HbA1c in 2–3 months for diabetes confirmation",
+                "Serum vitamin B12 level repeat and methylmalonic acid if needed",
+                "Serum 25‑OH vitamin D repeat after supplementation",
+                "Lipid panel (already available) – follow‑up in 3–6 months",
+                "If meningeal signs appear: lumbar puncture with CSF analysis"
+            ],
+            "suggested_medications": [
+                "Acetaminophen 500 mg PO q6h PRN for fever/pain (max 3 g/24 h)",
+                "Ondansetron 4 mg PO q8h PRN for nausea if needed",
+                "Encourage oral hydration (2–3 L/day) and rest",
+                "If bacterial sinusitis becomes likely (purulent nasal discharge, facial pain >10 days): consider amoxicillin 500 mg PO TID for 5‑7 days",
+                "If diabetes confirmed: lifestyle counseling; consider metformin 500 mg PO BID after repeat labs and renal function assessment",
+                "Vitamin B12 supplementation: cyanocobalamin 1000 µg PO daily for 1 month, then reassess",
+                "Vitamin D supplementation: cholecalciferol 2000 IU PO daily (adjust based on follow‑up levels)",
+                "If IgE‑mediated allergy suspected (e.g., environmental/allergic rhinitis): consider oral antihistamine (cetirizine 10 mg PO daily)"
+            ],
+            "medication_disclaimer": "A qualified human doctor must make the final prescribing decision, taking into account the full clinical picture, allergies, contraindications, and local guidelines.",
+            "information_gaps": [
+                "Exact onset time of headache and fever (hours vs days).",
+                "Presence or absence of respiratory symptoms (cough, sore throat, nasal congestion).",
+                "Any photophobia, neck stiffness, or meningeal signs on physical exam.",
+                "Recent travel, sick contacts, or COVID‑19 exposure history.",
+                "Menstrual history and pregnancy status (relevant for medication safety).",
+                "Current use of antipyretics or analgesics prior to presentation."
+            ]
+        }
+    },
+    "lab_results": {
+        "lab_report": {
+            "summary": "```json\n{\n  \"abnormal_findings\": [\n    {\n      \"parameter\": \"WBC Count\",\n      \"value\": \"10570\",\n      \"standard_range\": \"4000-10000\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Fasting Blood Sugar\",\n      \"value\": \"141.0\",\n      \"standard_range\": \"74-106\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"HbA1c\",\n      \"value\": \"7.10\",\n      \"standard_range\": \"For Screening: Diabetes: >6.5%, Pre-Diabetes: 5.7% - 6.4%, Non-Diabetes: < 5.7%\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Vitamin B12\",\n      \"value\": \"< 148\",\n      \"standard_range\": \"187-833\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Homocysteine, Serum\",\n      \"value\": \"23.86\",\n      \"standard_range\": \"6.0-14.8\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"IgE\",\n      \"value\": \"492.30\",\n      \"standard_range\": \"0-87\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"25(OH) Vitamin D\",\n      \"value\": \"8.98\",\n      \"standard_range\": \"Sufficiency: 30-100\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Triglyceride\",\n      \"value\": \"168.0\",\n      \"standard_range\": \"Normal: <150\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Direct LDL\",\n      \"value\": \"100.39\",\n      \"standard_range\": \"Optimal: <100\",\n      \"interpretation\": \"High\"\n    }\n  ],\n  \"concerns\": [\n    \"Potential diabetes or pre-diabetes due to high Fasting Blood Sugar and HbA1c levels\",\n    \"Vitamin B12 deficiency, which may cause neurological issues or anemia\",\n    \"Elevated homocysteine levels, which may indicate cardiovascular risk\",\n    \"Allergic reactions or hypersensitivity due to high IgE levels\",\n    \"Vitamin D deficiency, which may affect bone health\",\n    \"Hypertriglyceridemia, which may increase cardiovascular risk\",\n    \"Elevated LDL cholesterol, which may increase cardiovascular risk\"\n  ]\n}\n```"
+        }
+    },
+    "has_lab_data": true,
+    "interview_summary": {
+        "known_facts": {
+            "vitals": {
+                "temperature": "100.7",
+                "bp": "125/74",
+                "pulse": "67",
+                "spo2": "98"
+            },
+            "initial_complaint": "headache and fever"
+        },
+        "unavailable_information": [
+            "previous_health_records"
+        ],
+        "total_turns": 0,
+        "final_confidence": 0.5
+    }
+}

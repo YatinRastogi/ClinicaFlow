@@ -24,7 +24,7 @@ import fitz  # PyMuPDF
 from dotenv import load_dotenv
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
-
+from utils.rag import retrieve_medical_context
 from utils.interview_memory import (
     MAX_TURNS,
     apply_extraction_to_state,
@@ -605,6 +605,7 @@ builder.add_node("refine_questions",            refine_questions_node)
 builder.add_node("extract_memory",              extract_memory_node)
 builder.add_node("ask_one_question",            ask_one_question_node)
 builder.add_node("triage_router",               triage_router_node)
+builder.add_node("retrieve_context",            retrieve_context_node)
 builder.add_node("general_medicine_analysis",   general_medicine_analysis_node)
 builder.add_node("cardiology_analysis",         cardiology_analysis_node)
 builder.add_node("dermatology_analysis",        dermatology_analysis_node)
@@ -638,11 +639,13 @@ builder.add_conditional_edges(
     decide_to_continue_chat,
     {"continue_chat": "extract_memory", "end_chat": "triage_router"},
 )
-
+# Triage always goes to RAG first
+builder.add_edge("triage_router", "retrieve_context")
 # Triage routes to specialist
+# RAG then routes to the right specialist using diagnosis_path
 builder.add_conditional_edges(
-    "triage_router",
-    route_to_specialist,
+    "retrieve_context",
+    route_to_specialist,   # already exists, reads state["diagnosis_path"]
     {
         "general_medicine": "general_medicine_analysis",
         "cardiology":       "cardiology_analysis",

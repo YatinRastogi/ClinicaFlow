@@ -1,0 +1,122 @@
+{
+    "raw_input": {
+        "weight": 63,
+        "symptoms": "headache, fever",
+        "duration": "less than 1 hour",
+        "vitals": {
+            "temperature": "100.4",
+            "bp": "124/78",
+            "pulse": "70",
+            "spo2": "98"
+        },
+        "files": {
+            "lab_report": "temp_uploads\\2f67d672-6aa0-4161-b314-bf4a03b76003_blood_test_report.pdf"
+        }
+    },
+    "patient_profile": {
+        "name": "Ashley Grahm",
+        "age": 20,
+        "gender": "female",
+        "blood_group": "A+",
+        "family_history": "None",
+        "pre_existing_conditions": "None"
+    },
+    "final_analysis": {
+        "status": "complete",
+        "analysis": {
+            "probable_diagnosis": {
+                "condition": "New‑onset type 2 diabetes mellitus presenting with hyperglycemia (fasting glucose 141 mg/dL, HbA1c 7.1%) and associated polyuria, nausea, and weakness, likely accompanied by a mild febrile illness (fever 100.4 °F, leukocytosis).",
+                "confidence": 78,
+                "reasoning": "The patient has a mild fever and leukocytosis suggesting an acute infection, but the dominant metabolic abnormalities are elevated fasting glucose and HbA1c, which meet diagnostic criteria for diabetes. Frequent urination, nausea, and generalized weakness are classic hyperglycemia symptoms. Headache can be secondary to dehydration or infection. No signs of severe infection (stable vitals, normal BP, pulse, SpO2) and glucose is not in the DKA range, making uncomplicated hyperglycemia the most plausible primary problem.",
+                "evidence": [
+                    "Fasting Blood Sugar 141 mg/dL (high)",
+                    "HbA1c 7.1 % (diabetic range)",
+                    "Frequent urination reported by patient",
+                    "Nausea and weakness",
+                    "Temperature 100.4 °F and WBC 10,570 /µL indicating mild infection",
+                    "Absence of severe vital sign abnormalities"
+                ],
+                "urgency": "Medium"
+            },
+            "differential_diagnosis": [
+                {
+                    "condition": "Urinary tract infection (UTI) – could explain fever, polyuria, and leukocytosis.",
+                    "reasoning": "Polyuria may be due to bladder irritation; however, no dysuria or suprapubic pain reported."
+                },
+                {
+                    "condition": "Viral upper respiratory infection",
+                    "reasoning": "Mild fever and leukocytosis can be viral; no respiratory symptoms noted."
+                },
+                {
+                    "condition": "Vitamin B12 deficiency–related anemia/neuropathy",
+                    "reasoning": "Low B12 and high homocysteine could cause weakness, but acute fever is unlikely."
+                },
+                {
+                    "condition": "Early meningitis",
+                    "reasoning": "Headache and fever raise concern, but no neck stiffness or photophobia reported."
+                },
+                {
+                    "condition": "Pregnancy‑related hyperglycemia",
+                    "reasoning": "Female of child‑bearing age; pregnancy test not yet performed."
+                }
+            ],
+            "recommended_tests": [
+                "Urinalysis with glucose and ketones",
+                "Urine culture",
+                "Basic metabolic panel (electrolytes, BUN, creatinine)",
+                "CBC with differential (repeat to monitor WBC trend)",
+                "CRP and ESR (to gauge inflammatory burden)",
+                "Blood cultures if fever persists >48 h or clinical deterioration",
+                "Oral glucose tolerance test (if diabetes confirmation needed)",
+                "Thyroid function tests (TSH, free T4) – to rule out hyperthyroidism as a cause of weakness",
+                "Pregnancy test (urine hCG)",
+                "Neurologic exam and, if indicated, nerve conduction studies (for B12‑related neuropathy)",
+                "Repeat vitamin B12 level after supplementation (to confirm repletion)",
+                "Chest X‑ray (if any respiratory symptoms develop)"
+            ],
+            "suggested_medications": [
+                "Metformin 500 mg PO daily (titrated up as tolerated) – first‑line for newly diagnosed type 2 diabetes, unless contraindicated.",
+                "Cyanocobalamin 1000 µg IM weekly for 4 weeks, then monthly (or high‑dose oral B12) – to correct B12 deficiency.",
+                "Vitamin D3 (cholecalciferol) 2000 IU PO daily – to address severe deficiency.",
+                "Low‑intensity statin (e.g., rosuvastatin 5 mg PO daily) – for elevated LDL and triglycerides after cardiovascular risk assessment.",
+                "Acetaminophen 500 mg PO q6h PRN for fever/pain.",
+                "Ondansetron 4 mg PO q8h PRN for persistent nausea."
+            ],
+            "medication_disclaimer": "A qualified human doctor must make the final prescribing decision.",
+            "information_gaps": [
+                "Urinalysis and urine culture results to confirm or exclude a urinary tract infection.",
+                "Pregnancy status, which influences medication choices.",
+                "Detailed physical exam findings (e.g., neck stiffness, neurologic deficits).",
+                "Dietary and lifestyle information to guide diabetes education.",
+                "Duration and progression of fever beyond the initial hour."
+            ]
+        }
+    },
+    "lab_results": {
+        "lab_report": {
+            "summary": "```json\n{\n  \"abnormal_findings\": [\n    {\n      \"parameter\": \"WBC Count\",\n      \"value\": \"10570\",\n      \"standard_range\": \"4000-10000\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Fasting Blood Sugar\",\n      \"value\": \"141.0\",\n      \"standard_range\": \"74-106\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"HbA1c\",\n      \"value\": \"7.10\",\n      \"standard_range\": \"For Screening: Diabetes: >6.5%, Pre-Diabetes: 5.7% - 6.4%, Non-Diabetes: < 5.7%\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Vitamin B12\",\n      \"value\": \"< 148\",\n      \"standard_range\": \"187-833\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Homocysteine, Serum\",\n      \"value\": \"23.86\",\n      \"standard_range\": \"6.0-14.8\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"IgE\",\n      \"value\": \"492.30\",\n      \"standard_range\": \"0-87\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"25(OH) Vitamin D\",\n      \"value\": \"8.98\",\n      \"standard_range\": \"30-100\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Triglyceride\",\n      \"value\": \"168.0\",\n      \"standard_range\": \"<150\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Direct LDL\",\n      \"value\": \"100.39\",\n      \"standard_range\": \"<100\",\n      \"interpretation\": \"High\"\n    }\n  ],\n  \"concerns\": [\n    \"Potential diabetes or pre-diabetes due to high Fasting Blood Sugar and HbA1c levels\",\n    \"Vitamin B12 deficiency, which may cause neurological issues or anemia\",\n    \"Elevated homocysteine levels, which may indicate cardiovascular risk\",\n    \"Allergic reactions or hypersensitivity due to high IgE levels\",\n    \"Vitamin D deficiency, which may affect bone health\",\n    \"Hypertriglyceridemia, which may increase cardiovascular risk\",\n    \"Elevated LDL cholesterol, which may increase cardiovascular risk\"\n  ]\n}\n```"
+        }
+    },
+    "has_lab_data": true,
+    "interview_summary": {
+        "known_facts": {
+            "vitals": {
+                "temperature": "100.4",
+                "bp": "124/78",
+                "pulse": "70",
+                "spo2": "98"
+            },
+            "initial_complaint": "headache, fever",
+            "nausea": "present",
+            "weakness": "present",
+            "current_medications": "none",
+            "drug_allergy": "none",
+            "frequent_urination": "yes"
+        },
+        "unavailable_information": [
+            "previous_health_records"
+        ],
+        "total_turns": 4,
+        "final_confidence": 0.95
+    }
+}

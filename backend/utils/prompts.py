@@ -410,10 +410,12 @@ medical_report_prompt = ChatPromptTemplate.from_messages([
      - **Key Drivers:** [List evidence]
 
      ## Probable Diagnosis
-     - **Condition:** [condition]
-     - **Confidence:** [confidence]%
-     - **Justification (Explainability Pack):**
-         - [Link evidence to conclusion]
+        - **Condition:** [Extract from final_analysis.analysis.probable_diagnosis.condition]
+        - **    Confidence:** [Extract from final_analysis.analysis.probable_diagnosis.confidence]%
+        - **Justification (Explainability Pack):**
+        - **Reasoning:** [Extract from final_analysis.analysis.probable_diagnosis.reasoning]
+        - **Supporting Evidence:**
+        - [List each item from final_analysis.analysis.probable_diagnosis.evidence]
 
      ## Differential Diagnoses
      - [List each with reasoning]

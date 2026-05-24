@@ -1,0 +1,117 @@
+{
+    "raw_input": {
+        "weight": 65,
+        "symptoms": "stomach pain and vomiting",
+        "duration": "1 24 hours",
+        "vitals": {
+            "temperature": "100.1",
+            "bp": "115/82",
+            "pulse": "69",
+            "spo2": "91"
+        },
+        "files": {
+            "lab_report": "temp_uploads\\d51e84a1-f0e2-4a06-9468-3c355be13347_blood_test_report.pdf"
+        }
+    },
+    "patient_profile": {
+        "name": "Ashley Grahm",
+        "age": 20,
+        "gender": "female",
+        "blood_group": "A+",
+        "family_history": "None",
+        "pre_existing_conditions": "None"
+    },
+    "final_analysis": {
+        "status": "complete",
+        "analysis": {
+            "probable_diagnosis": {
+                "condition": "Acute food‑borne gastroenteritis (bacterial) likely secondary to recent fast‑food burger consumption",
+                "confidence": 70,
+                "reasoning": "The patient presents with moderate, sharp mid‑abdominal pain that worsens with movement, vomiting, low‑grade fever (100.1°F), leukocytosis (WBC 10,570), and a recent history of eating a fast‑food burger. These findings are classic for an acute infectious gastroenteritis. The hypoxia (SpO2 91%) is likely secondary to dehydration and possible mild respiratory compromise from vomiting, but warrants further evaluation. The laboratory abnormalities (elevated fasting glucose and HbA1c) suggest a new diagnosis of diabetes, which can exacerbate infection and dehydration, but the glucose level is not high enough for DKA. No localized signs of appendicitis, pancreatitis, or urinary infection are reported.",
+                "evidence": [
+                    "Mid‑abdominal sharp pain worsened by movement, present since this morning",
+                    "Vomiting with low‑grade fever (100.1°F)",
+                    "Leukocytosis (WBC 10,570)",
+                    "Recent ingestion of a fast‑food burger",
+                    "Hypoxia (SpO2 91%) likely from dehydration"
+                ],
+                "urgency": "High"
+            },
+            "differential_diagnosis": [
+                {
+                    "condition": "Early appendicitis",
+                    "reasoning": "Mid‑abdominal pain could evolve to RLQ; however, no localized tenderness, rebound, or migration described."
+                },
+                {
+                    "condition": "Viral gastroenteritis",
+                    "reasoning": "Similar presentation but leukocytosis and recent burger point more toward bacterial cause."
+                },
+                {
+                    "condition": "Acute pancreatitis",
+                    "reasoning": "Epigastric pain and vomiting possible, but no radiation to back, no elevated lipase/amylase reported."
+                },
+                {
+                    "condition": "Pyelonephritis",
+                    "reasoning": "Flank tenderness not reported; urinary symptoms absent."
+                },
+                {
+                    "condition": "New‑onset diabetes with hyperglycemia‑related dehydration",
+                    "reasoning": "Elevated fasting glucose (141) and HbA1c (7.1) indicate diabetes, which can worsen dehydration and infection, but glucose not high enough for DKA."
+                }
+            ],
+            "recommended_tests": [
+                "CBC with differential (to confirm leukocytosis and assess anemia)",
+                "Comprehensive metabolic panel (electrolytes, renal function, liver enzymes)",
+                "Serum lactate",
+                "Arterial blood gas (to evaluate oxygenation and acid‑base status)",
+                "Serum ketones (beta‑hydroxybutyrate) – rule out early DKA",
+                "Stool culture, ova & parasites, and Clostridioides difficile PCR",
+                "Rapid viral gastroenteritis panel (e.g., norovirus, rotavirus)",
+                "Abdominal ultrasound (to assess for appendicitis, gallbladder, or other intra‑abdominal pathology)",
+                "If ultrasound inconclusive and pain persists, contrast‑enhanced CT abdomen/pelvis",
+                "Chest X‑ray (to investigate cause of hypoxia)",
+                "Pregnancy test (urine hCG) – confirm negative despite patient’s statement",
+                "Blood cultures (if febrile or septic picture develops)",
+                "Serum lipase (to rule out pancreatitis)",
+                "Repeat SpO2 with supplemental O₂ trial"
+            ],
+            "suggested_medications": [
+                "Ondansetron 4–8 mg IV/PO q8h for nausea/vomiting",
+                "IV normal saline bolus 1–2 L (adjust for weight and dehydration status)",
+                "Acetaminophen 650 mg PO q6h PRN for fever/pain (if no contraindication)",
+                "If bacterial gastroenteritis suspected and patient is high‑risk (e.g., immunocompromised, severe), consider empiric oral ciprofloxacin 500 mg BID for 3 days (pending stool culture)",
+                "If glucose remains >180 mg/dL, consider short‑acting insulin sliding scale (monitor closely)",
+                "Supplemental oxygen to maintain SpO2 >94% (e.g., nasal cannula 2 L/min)"
+            ],
+            "medication_disclaimer": "A qualified human doctor must make the final prescribing decision after a physical exam and review of all test results.",
+            "information_gaps": [
+                "Results of stool studies and abdominal imaging to confirm infectious etiology versus surgical abdomen",
+                "Arterial blood gas and lactate to assess severity of hypoxia and possible sepsis",
+                "Serum ketones and repeat glucose to rule out evolving diabetic ketoacidosis",
+                "Physical exam details (e.g., peritoneal signs, rebound tenderness, bowel sounds) that could alter urgency"
+            ]
+        }
+    },
+    "lab_results": {
+        "lab_report": {
+            "summary": "```json\n{\n  \"abnormal_findings\": [\n    {\n      \"parameter\": \"WBC Count\",\n      \"value\": \"10570\",\n      \"standard_range\": \"4000-10000\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Fasting Blood Sugar\",\n      \"value\": \"141.0\",\n      \"standard_range\": \"74-106\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"HbA1c\",\n      \"value\": \"7.10\",\n      \"standard_range\": \"For Screening: Diabetes: >6.5%, Pre-Diabetes: 5.7% - 6.4%, Non-Diabetes: < 5.7%\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Vitamin B12\",\n      \"value\": \"< 148\",\n      \"standard_range\": \"187-833\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"IgE\",\n      \"value\": \"492.30\",\n      \"standard_range\": \"0-87\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Homocysteine\",\n      \"value\": \"23.86\",\n      \"standard_range\": \"6.0-14.8\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"25(OH) Vitamin D\",\n      \"value\": \"8.98\",\n      \"standard_range\": \"30-100\",\n      \"interpretation\": \"Low\"\n    },\n    {\n      \"parameter\": \"Triglyceride\",\n      \"value\": \"168.0\",\n      \"standard_range\": \"<150\",\n      \"interpretation\": \"High\"\n    },\n    {\n      \"parameter\": \"Direct LDL\",\n      \"value\": \"100.39\",\n      \"standard_range\": \"<100\",\n      \"interpretation\": \"High\"\n    }\n  ],\n  \"concerns\": [\n    \"Potential diabetes or pre-diabetic condition due to high fasting blood sugar and HbA1c levels\",\n    \"Vitamin B12 deficiency, which may cause neurological issues or anemia\",\n    \"Elevated homocysteine levels, indicating potential cardiovascular risk or vitamin deficiency\",\n    \"Low vitamin D levels, which may affect bone health or immune function\",\n    \"High triglycerides and LDL cholesterol, indicating potential cardiovascular risk\",\n    \"Elevated IgE levels, suggesting allergic reactions or conditions\"\n  ]\n}\n```"
+        }
+    },
+    "has_lab_data": true,
+    "interview_summary": {
+        "known_facts": {
+            "vitals": {
+                "temperature": "100.1",
+                "bp": "115/82",
+                "pulse": "69",
+                "spo2": "91"
+            },
+            "initial_complaint": "stomach pain and vomiting"
+        },
+        "unavailable_information": [
+            "previous_health_records"
+        ],
+        "total_turns": 0,
+        "final_confidence": 0.5
+    }
+}

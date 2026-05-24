@@ -189,30 +189,26 @@ async def chat(
 
         # ------------------------------------------------------------------
         # Branch B: continuing an existing conversation
-        # ------------------------------------------------------------------
         else:
             print(f"--- MSG: Continuing conversation: {convo_id} ---")
             human_answer = user_input.get("answer", "")
 
-            # Fetch current graph state
             current_snapshot = await asyncio.to_thread(
                 graph_with_checkpoint.get_state, config
             )
-            if not current_snapshot:
+            if not current_snapshot or not current_snapshot.values:
                 raise HTTPException(status_code=404, detail="Conversation not found.")
 
-            # With interrupt_before=["extract_memory"], the graph is paused
-            # BEFORE extract_memory runs. We only need to inject the human
-            # reply into the message history — extract_memory_node runs first
-            # inside the graph on resume, so we do NOT extract here to avoid
-            # double-processing.
             current_values = dict(current_snapshot.values)
             messages = list(current_values.get("messages", []))
             messages.append({"role": "human", "content": human_answer})
             current_values["messages"] = messages
 
             await asyncio.to_thread(
-                graph_with_checkpoint.update_state, config, current_values
+                graph_with_checkpoint.update_state,
+                config,
+                current_values,
+                as_node="extract_memory",  # <-- THIS IS THE KEY FIX
             )
 
             graph_input = None  # Resume from checkpoint
@@ -258,5 +254,6 @@ async def chat(
         raise HTTPException(status_code=400, detail="Invalid JSON in user_input_json.")
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+        tb=traceback.print_exc()
+        print(f"--- ❌ FULL ERROR:\n{tb}")
+        raise HTTPException(status_code=500, detail=f"Internal error: {type(e).__name__}: {e}")
