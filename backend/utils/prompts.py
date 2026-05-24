@@ -24,6 +24,9 @@ intake_prompt = ChatPromptTemplate.from_messages([
     ("system",
      """You are a Clinical Intake Specialist AI. Your role is to meticulously structure patient information.
 
+     **Permanent Patient Profile (DO NOT ask the patient for this information, you already have it):**
+     {patient_profile}
+
      **Instructions:**
      1.  Analyze the provided patient data and vitals.
      2.  Normalize the symptoms into a list of standardized medical terms.
@@ -121,6 +124,9 @@ triage_router_prompt = ChatPromptTemplate.from_messages([
 next_question_prompt = ChatPromptTemplate.from_messages([
     ("system",
      """You are a Clinical Interview AI conducting a dynamic medical interview.
+
+**Permanent Patient Profile (DO NOT ask the patient for this information, you already have it):**
+{patient_profile}
 
 {memory_context}
 
@@ -234,7 +240,7 @@ question_refinement_prompt = ChatPromptTemplate.from_messages([
 from langchain_core.messages import HumanMessage, SystemMessage
 
 
-def _build_specialist_system_text(role: str, max_turns: int, memory_context: str) -> str:
+def _build_specialist_system_text(role: str, max_turns: int, memory_context: str, patient_profile: str) -> str:
     """
     Return the fully-rendered system prompt string for a specialist.
 
@@ -245,6 +251,8 @@ def _build_specialist_system_text(role: str, max_turns: int, memory_context: str
     """
     return (
         f"You are an expert AI medical diagnostician acting as a **{role}**.\n\n"
+        "**Permanent Patient Profile (DO NOT ask the patient for this information, you already have it):**\n"
+        f"{patient_profile}\n\n"
         f"{memory_context}\n\n"
         "**Step 1: Assess Information Sufficiency**\n"
         "- Review all structured data, lab results, and the full conversation history.\n"
@@ -327,11 +335,12 @@ class SpecialistPrompt:
         memory_context: str,
         structured_data: str,
         conversation_history: str,
+        patient_profile: str = "No permanent profile found.",
         red_flags: str = "None detected",
         retrieved_context: str = "No additional guidelines retrieved.",
     ):
         system_text = _build_specialist_system_text(
-            self.role, self.max_turns, memory_context
+            self.role, self.max_turns, memory_context, patient_profile
         )
         human_text = (
             "Please assess and analyse the following patient record:\n\n"
@@ -388,8 +397,9 @@ medical_report_prompt = ChatPromptTemplate.from_messages([
      # Diagnostic Summary Report
 
      ## Patient Overview
-     - **Patient Name:** [Extract from raw_input]
-     - **Age:** [Extract from raw_input]
+     - **Patient Name:** [Extract from patient_profile]
+     - **Age:** [Extract from patient_profile]
+     - **Gender:** [Extract from patient_profile]
      - **Primary Complaint:** [Extract from raw_input.symptoms]
 
      ## Red-Flag Alert

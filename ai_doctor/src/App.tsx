@@ -4,6 +4,7 @@ import {
   AlertTriangle, Shield, Plus, X, Loader2, CheckCircle
 } from 'lucide-react';
 import { ChatPanel } from './ChatPanel';
+import { Auth } from './Auth';
 
 // --- CHILD COMPONENTS ---
 
@@ -47,14 +48,6 @@ const PatientInputForm = ({
 
   const handleSubmit = () => {
     // Basic validation
-    if (!patientData.name.trim()) {
-      setFormError('Please enter patient name.');
-      return;
-    }
-    if (!patientData.age) {
-      setFormError('Please enter patient age.');
-      return;
-    }
     if (symptoms.length === 0) {
       setFormError('Please add at least one symptom.');
       return;
@@ -76,40 +69,7 @@ const PatientInputForm = ({
           <User className="text-indigo-600 mr-3" size={24} />
           <h2 className="text-xl font-semibold text-gray-800">Patient Information</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Name <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              placeholder="e.g., Bob"
-              value={patientData.name}
-              onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Age <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              placeholder="Years"
-              value={patientData.age}
-              onChange={(e) => setPatientData({ ...patientData, age: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-            <select
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              value={patientData.gender}
-              onChange={(e) => setPatientData({ ...patientData, gender: e.target.value })}
-            >
-              <option value="">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
             <input
@@ -128,16 +88,6 @@ const PatientInputForm = ({
               placeholder="cm"
               value={patientData.height}
               onChange={(e) => setPatientData({ ...patientData, height: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Blood Group</label>
-            <input
-              type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              placeholder="e.g., B+"
-              value={patientData.blood_group}
-              onChange={(e) => setPatientData({ ...patientData, blood_group: e.target.value })}
             />
           </div>
         </div>
@@ -217,7 +167,7 @@ const PatientInputForm = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Thermometer className="inline mr-2" size={16} />Temperature (°F)
+              <Thermometer className="inline mr-2" size={16} />Temperature (°C)
             </label>
             <input type="number" step="0.1" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="98.6" value={vitals.temperature} onChange={(e) => setVitals(prev => ({ ...prev, temperature: e.target.value }))} />
           </div>
@@ -324,7 +274,7 @@ const PatientInputForm = ({
 
 // --- CLINICIAN DASHBOARD ---
 
-const ClinicianDashboard = ({ patientData, vitals, symptoms, finalReportData, finalReportUrl }: any) => {
+const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, finalReportData, finalReportUrl }: any) => {
   const calculateBMI = () => {
     if (patientData.weight && patientData.height) {
       const heightInMeters = patientData.height / 100;
@@ -457,9 +407,9 @@ const ClinicianDashboard = ({ patientData, vitals, symptoms, finalReportData, fi
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="font-semibold text-gray-800 mb-4">Patient Summary</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-gray-600">Name:</span><span className="font-medium">{patientData.name || 'N/A'}</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">Age:</span><span>{patientData.age || 'N/A'} years</span></div>
-              <div className="flex justify-between"><span className="text-gray-600">Gender:</span><span className="capitalize">{patientData.gender || 'N/A'}</span></div>
+              <div className="flex justify-between"><span className="text-gray-600">Name:</span><span className="font-medium">{patientProfile.name || 'N/A'}</span></div>
+              <div className="flex justify-between"><span className="text-gray-600">Age:</span><span>{patientProfile.age || 'N/A'} years</span></div>
+              <div className="flex justify-between"><span className="text-gray-600">Gender:</span><span className="capitalize">{patientProfile.gender || 'N/A'}</span></div>
               <div className="flex justify-between"><span className="text-gray-600">BMI:</span><span>{calculateBMI()}</span></div>
               <div className="flex justify-between"><span className="text-gray-600">Symptoms:</span><span className="text-right max-w-[60%]">{primarySymptoms}</span></div>
               <div className="flex justify-between"><span className="text-gray-600">Duration:</span><span className="capitalize">{longestDuration}</span></div>
@@ -522,11 +472,11 @@ const ClinicianDashboard = ({ patientData, vitals, symptoms, finalReportData, fi
 
 // --- MAIN PARENT COMPONENT ---
 
-const DiagnosticSystem = () => {
+const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, onLogout: () => void }) => {
   const [activeTab, setActiveTab] = useState('patient');
   const [symptoms, setSymptoms] = useState<{ name: string; duration: string; severity: string }[]>([]);
   const [vitals, setVitals] = useState({ temperature: '', bp_systolic: '', bp_diastolic: '', spo2: '', pulse: '', respiratory_rate: '' });
-  const [patientData, setPatientData] = useState({ name: '', age: '', gender: '', weight: '', height: '', blood_group: '' });
+  const [patientData, setPatientData] = useState({ weight: '', height: '' });
   const [labReport, setLabReport] = useState<File | null>(null);
   const [healthRecord, setHealthRecord] = useState<File | null>(null);
 
@@ -545,14 +495,11 @@ const DiagnosticSystem = () => {
     setApiError(null);
 
     const jsonData = {
+      patient_profile: patientProfile,
       patient_data: {
-        Name: patientData.name,
-        age: parseInt(patientData.age) || 0,
         weight: parseInt(patientData.weight) || 0,
-        gender: patientData.gender,
-        blood_group: patientData.blood_group,
         symptoms: symptoms.map(s => s.name).join(', ') || 'No symptoms reported',
-        duration: symptoms[0]?.duration.replace(/_/g, ' ') || 'N/A',
+        duration: symptoms.length > 0 ? symptoms[0].duration.replace(/_/g, ' ') : 'N/A',
         vitals: {
           temperature: vitals.temperature,
           bp: `${vitals.bp_systolic}/${vitals.bp_diastolic}`,
@@ -670,12 +617,19 @@ const DiagnosticSystem = () => {
                 {finalReport && <span className="ml-2 bg-green-500 text-white text-xs rounded-full px-2 py-0.5">Ready</span>}
               </button>
             </nav>
-            {isLoading && (
-              <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium">
-                <Loader2 size={16} className="animate-spin" />
-                Processing…
+            <div className="flex items-center gap-4">
+              {isLoading && (
+                <div className="flex items-center gap-2 text-indigo-600 text-sm font-medium">
+                  <Loader2 size={16} className="animate-spin" />
+                  Processing…
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <User size={16} />
+                <span>{patientProfile.name}</span>
+                <button onClick={onLogout} className="ml-2 text-red-500 hover:text-red-700 font-medium">Logout</button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -709,6 +663,7 @@ const DiagnosticSystem = () => {
         />
       ) : (
         <ClinicianDashboard
+          patientProfile={patientProfile}
           patientData={patientData}
           vitals={vitals}
           symptoms={symptoms}
@@ -729,4 +684,12 @@ const DiagnosticSystem = () => {
   );
 };
 
-export default DiagnosticSystem;
+export default function App() {
+  const [patientProfile, setPatientProfile] = useState<any>(null);
+
+  if (!patientProfile) {
+    return <Auth onLogin={setPatientProfile} />;
+  }
+
+  return <DiagnosticSystem patientProfile={patientProfile} onLogout={() => setPatientProfile(null)} />;
+}

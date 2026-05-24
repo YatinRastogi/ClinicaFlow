@@ -79,6 +79,19 @@ class PatientState(TypedDict, total=False):
     report_json_path: str
     retrieved_context: str
     red_flags: List[str]
+    patient_profile: Dict[str, Any]
+
+def format_patient_profile(profile: Optional[Dict[str, Any]]) -> str:
+    if not profile:
+        return "No permanent profile found."
+    return f"""
+    Name: {profile.get('name', 'Unknown')}
+    Age: {profile.get('age', 'Unknown')}
+    Gender: {profile.get('gender', 'Unknown')}
+    Blood Group: {profile.get('blood_group', 'Unknown')}
+    Pre-existing Conditions: {profile.get('pre_existing_conditions', 'None')}
+    Family History: {profile.get('family_history', 'None')}
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +133,7 @@ def retrieve_context_node(state: PatientState) -> Dict[str, Any]:
     facts_string = ", ".join([f"{k}: {v}" for k, v in known_facts.items()])
     enhanced_query = f"{base_symptoms}. {facts_string}"
 
-    print(f"--- 🔍 Enhanced RAG Query: {enhanced_query} ---")
+    print(f"--- SEARCH: Enhanced RAG Query: {enhanced_query} ---")
 
     # 4. Retrieve targeted docs using the enhanced query
     context = retrieve_medical_context(enhanced_query, specialty)
@@ -153,7 +166,7 @@ def _conversation_history_text(messages: List[Dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 
 def preprocess_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 📝 PREPROCESSING INITIAL DATA ---")
+    print("--- DOC: PREPROCESSING INITIAL DATA ---")
     raw = state.get("raw_input", {})
     messages = state.get("messages", [])
     messages.append(
@@ -161,8 +174,10 @@ def preprocess_node(state: PatientState) -> Dict[str, Any]:
     )
 
     vitals = raw.get("vitals") or {}
+    patient_profile_text = format_patient_profile(state.get("patient_profile"))
     chain = intake_prompt | llm
     llm_response = chain.invoke({
+        "patient_profile": patient_profile_text,
         "patient_data": json.dumps(raw),
         "temperature": vitals.get("temperature", ""),
         "bp": vitals.get("bp", ""),
@@ -207,7 +222,7 @@ def preprocess_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def process_all_lab_reports_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 📄 PROCESSING LAB REPORTS ---")
+    print("--- FILE: PROCESSING LAB REPORTS ---")
     files = state.get("raw_input", {}).get("files", {})
     lab_results: Dict[str, Any] = {}
 
@@ -331,9 +346,11 @@ def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
 
     memory_context = build_memory_context_block(interview_state)
     conversation_history = _conversation_history_text(messages)
+    patient_profile_text = format_patient_profile(state.get("patient_profile"))
 
     chain = next_question_prompt | llm
     llm_response = chain.invoke({
+        "patient_profile": patient_profile_text,
         "memory_context": memory_context,
         "structured_data": json.dumps(structured_input, indent=2),
         "conversation_history": conversation_history,
@@ -415,14 +432,15 @@ def run_specialist_analysis(
     structured_data = json.dumps(state.get("structured_input", {}), indent=2)
     conversation_history = _conversation_history_text(state.get("messages", []))
 
-    # Pull the RAG context we just saved to the state
     retrieved_context = state.get("retrieved_context", "No additional guidelines retrieved.")
     red_flags = "\n".join(state.get("red_flags", ["None detected"]))
+    patient_profile_text = format_patient_profile(state.get("patient_profile"))
 
     messages = specialist_prompt.build_messages(
         memory_context=memory_context,
         red_flags=red_flags,
         retrieved_context=retrieved_context,
+        patient_profile=patient_profile_text,
         structured_data=structured_data,
         conversation_history=conversation_history,
     )
@@ -442,7 +460,7 @@ def run_specialist_analysis(
     }
 
     if response_json.get("status") == "incomplete":
-        print("--- 🩺 SPECIALIST REQUIRES MORE INFORMATION ---")
+        print("--- MED: SPECIALIST REQUIRES MORE INFORMATION ---")
         updated_structured = state.get("structured_input", {}).copy()
         updated_structured["missing_information"] = response_json.get("missing_information", [])
         updates["structured_input"] = updated_structured
@@ -452,7 +470,7 @@ def run_specialist_analysis(
         updated_interview = update_confidence(updated_interview, specialist_status="incomplete")
         updates["interview_state"] = updated_interview
     else:
-        print("--- ✅ SPECIALIST ANALYSIS COMPLETE ---")
+        print("--- DONE: SPECIALIST ANALYSIS COMPLETE ---")
         updated_interview = interview_state.copy()
         updated_interview = update_confidence(updated_interview, specialist_status="complete")
         updates["interview_state"] = updated_interview
@@ -461,17 +479,17 @@ def run_specialist_analysis(
 
 
 def general_medicine_analysis_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 🩺 GENERAL MEDICINE ANALYSIS ---")
+    print("--- MED: GENERAL MEDICINE ANALYSIS ---")
     return run_specialist_analysis(state, general_medicine_prompt, general_medicine_llm)
 
 
 def cardiology_analysis_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 🩺 CARDIOLOGY ANALYSIS ---")
+    print("--- MED: CARDIOLOGY ANALYSIS ---")
     return run_specialist_analysis(state, cardiology_prompt, cardiology_llm)
 
 
 def dermatology_analysis_node(state: PatientState) -> Dict[str, Any]:
-    print("--- 🩺 DERMATOLOGY ANALYSIS ---")
+    print("--- MED: DERMATOLOGY ANALYSIS ---")
     return run_specialist_analysis(state, dermatology_prompt, dermatology_llm)
 
 
@@ -485,6 +503,7 @@ def generate_report_node(state: PatientState) -> Dict[str, str]:
     has_lab_data = structured_input.get("has_lab_data", False)
     report_data = {
         "raw_input": state.get("raw_input"),
+        "patient_profile": state.get("patient_profile", {}),
         "final_analysis": state.get("final_analysis", {}),
         "lab_results": structured_input.get("lab_results"),
         "has_lab_data": has_lab_data,

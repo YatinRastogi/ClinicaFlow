@@ -18,9 +18,13 @@ import shutil
 import uuid
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, staticfiles
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, staticfiles, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+import bcrypt
+
+from database.models import SessionLocal, PatientProfile, engine
 
 from langgraph_logic import graph_with_checkpoint
 from utils.interview_memory import make_interview_state
@@ -66,6 +70,80 @@ class ChatResponse(BaseModel):
     interview_turn: Optional[int] = None
     confidence_score: Optional[float] = None
 
+# ---------------------------------------------------------------------------
+# Auth & DB setup
+# ---------------------------------------------------------------------------
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def get_password_hash(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except ValueError:
+        return False
+
+class PatientCreate(BaseModel):
+    username: str
+    password: str
+    name: str
+    age: int
+    gender: str
+    blood_group: str
+    family_history: str = "None"
+    pre_existing_conditions: str = "None"
+
+class PatientLogin(BaseModel):
+    username: str
+    password: str
+
+@app.post("/register")
+def register_patient(patient: PatientCreate, db: Session = Depends(get_db)):
+    db_user = db.query(PatientProfile).filter(PatientProfile.username == patient.username).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    new_patient = PatientProfile(
+        username=patient.username,
+        hashed_password=get_password_hash(patient.password), 
+        name=patient.name,
+        age=patient.age,
+        gender=patient.gender,
+        blood_group=patient.blood_group,
+        family_history=patient.family_history,
+        pre_existing_conditions=patient.pre_existing_conditions
+    )
+    db.add(new_patient)
+    db.commit()
+    db.refresh(new_patient)
+    return {"message": "Patient registered successfully", "patient_id": new_patient.id}
+
+@app.post("/login")
+def login_patient(patient: PatientLogin, db: Session = Depends(get_db)):
+    db_user = db.query(PatientProfile).filter(PatientProfile.username == patient.username).first()
+    if not db_user or not verify_password(patient.password, db_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+    
+    return {
+        "message": "Login successful",
+        "patient_id": db_user.id,
+        "profile": {
+            "name": db_user.name,
+            "age": db_user.age,
+            "gender": db_user.gender,
+            "blood_group": db_user.blood_group,
+            "family_history": db_user.family_history,
+            "pre_existing_conditions": db_user.pre_existing_conditions
+        }
+    }
+
 
 # ---------------------------------------------------------------------------
 # /diagnose/chat  — unified endpoint
@@ -87,8 +165,8 @@ async def chat(
         # Branch A: new conversation
         # ------------------------------------------------------------------
         if not conversation_id:
-            print(f"--- 🚀 Starting new conversation: {convo_id} ---")
-            patient_data = user_input
+            print(f"--- START: Starting new conversation: {convo_id} ---")
+            patient_data = user_input.get("patient_data", user_input)
             file_paths: Dict[str, str] = {}
 
             if lab_report:
@@ -104,13 +182,16 @@ async def chat(
                 file_paths["health_record"] = fp
 
             patient_data["files"] = file_paths
-            graph_input = {"raw_input": patient_data}
+            graph_input = {
+                "raw_input": patient_data,
+                "patient_profile": user_input.get("patient_profile")
+            }
 
         # ------------------------------------------------------------------
         # Branch B: continuing an existing conversation
         # ------------------------------------------------------------------
         else:
-            print(f"--- 💬 Continuing conversation: {convo_id} ---")
+            print(f"--- MSG: Continuing conversation: {convo_id} ---")
             human_answer = user_input.get("answer", "")
 
             # Fetch current graph state
