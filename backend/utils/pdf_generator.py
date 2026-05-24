@@ -349,6 +349,30 @@ class _MarkdownToStory:
 # ---------------------------------------------------------------------------
 # Plain-English section
 # ---------------------------------------------------------------------------
+def clean_text_for_pdf(text: str) -> str:
+    """Replaces unmappable Unicode characters with standard ASCII equivalents."""
+    replacements = {
+        "–": "-",  # Replace en-dash with standard hyphen
+        "—": "-",  # Replace em-dash with standard hyphen
+        "‑": "-",  # Replace non-breaking hyphen (U+2011)
+        "−": "-",  # Replace minus sign (U+2212)
+        "‒": "-",  # Replace figure dash (U+2012)
+        "―": "-",  # Replace horizontal bar (U+2015)
+        "“": '"',  # Replace smart left quote with standard quote
+        "”": '"',  # Replace smart right quote with standard quote
+        "‘": "'",  # Replace smart left single quote
+        "’": "'",  # Replace smart right single quote
+        "•": "-",  # Replace standard bullet points with hyphens
+        "…": "..."  # Replace ellipsis character with three dots
+    }
+
+    for fancy_char, standard_char in replacements.items():
+        text = text.replace(fancy_char, standard_char)
+
+    # Optional: Force encoding to drop any other unsupported characters safely
+    # text = text.encode('latin-1', 'ignore').decode('latin-1')
+
+    return text
 
 def _extract_section(heading_pattern: str, text: str) -> str:
     m = re.search(
@@ -586,10 +610,12 @@ def create_pdf_report(
         story.append(HRFlowable(width="100%", thickness=2, color=BRAND_ACCENT))
         story.append(Spacer(1, 10))
 
-        parser = _MarkdownToStory(styles)
-        story.extend(parser.feed(markdown_text))
+        clean_markdown = clean_text_for_pdf(markdown_text)
 
-        story.extend(_plain_english_section(markdown_text, styles))
+        parser = _MarkdownToStory(styles)
+        story.extend(parser.feed(clean_markdown))
+
+        story.extend(_plain_english_section(clean_markdown, styles))
 
         doc.build(
             story,
