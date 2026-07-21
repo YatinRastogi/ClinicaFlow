@@ -1,19 +1,48 @@
+# ==========================
 # Python
+# ==========================
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
 
-# Virtual environment
+# Virtual Environment
 .venv/
-.env
-# Databases
-*.db
+venv/
 
-# Chroma vector DB
+# Environment Variables
+.env
+*.env
+
+# ==========================
+# Databases
+# ==========================
+*.db
+*.sqlite3
+
+# Chroma DB
 backend/chroma_db/
 
-# Generated files
+# ==========================
+# IDE
+# ==========================
+.idea/
+.vscode/
+*.iml
+
+# ==========================
+# Generated Reports
+# ==========================
+*.pdf
 backend/generated_reports/
 backend/temp_uploads/
 
-# IDE
-.idea/
+# ==========================
+# Test Files
+# ==========================
+backend/test_*.py
+
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+Thumbs.db
