@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import {
   Heart, Thermometer, Activity, Upload, FileText, User, Stethoscope, TrendingUp,
-  AlertTriangle, Shield, Plus, X, Loader2, CheckCircle
+  AlertTriangle, Shield, Plus, X, Loader2, CheckCircle, Calendar
 } from 'lucide-react';
 import { ChatPanel } from './ChatPanel';
 import { Auth } from './Auth';
+import { DoctorPortal } from './DoctorPortal';
 
 // --- CHILD COMPONENTS ---
 
@@ -272,6 +273,81 @@ const PatientInputForm = ({
   );
 };
 
+const BookAppointment = ({ patientId }: { patientId: number }) => {
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [status, setStatus] = useState<{type: 'idle' | 'loading' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
+
+  React.useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/doctors')
+      .then(res => res.json())
+      .then(data => setDoctors(data.doctors || []))
+      .catch(() => setStatus({type: 'error', msg: 'Failed to load doctors'}));
+  }, []);
+
+  const handleBook = async () => {
+    if (!selectedDoctor || !selectedTime) return;
+    setStatus({type: 'loading', msg: ''});
+    try {
+      // Create a date object for today at the selected time (e.g. "14:00")
+      const today = new Date();
+      const [hours, minutes] = selectedTime.split(':');
+      today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      const isoString = today.toISOString();
+
+      const res = await fetch('http://127.0.0.1:8000/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doctor_id: parseInt(selectedDoctor), patient_id: patientId, appointment_time: isoString })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Booking failed');
+      
+      setStatus({type: 'success', msg: 'Appointment booked successfully!'});
+    } catch (e: any) {
+      setStatus({type: 'error', msg: e.message});
+    }
+  };
+
+  const availableSlots = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-indigo-100">
+      <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><Calendar className="text-indigo-500" size={20} /> Book Appointment</h3>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">Select Specialist</label>
+          <select className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" value={selectedDoctor} onChange={e => setSelectedDoctor(e.target.value)}>
+            <option value="">-- Choose Doctor --</option>
+            {doctors.map(d => <option key={d.id} value={d.id}>{d.name} ({d.specialty})</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">Select Time (Today)</label>
+          <select className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" value={selectedTime} onChange={e => setSelectedTime(e.target.value)}>
+            <option value="">-- Choose Time --</option>
+            {availableSlots.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <button 
+          onClick={handleBook}
+          disabled={!selectedDoctor || !selectedTime || status.type === 'loading'}
+          className="w-full py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+        >
+          {status.type === 'loading' ? 'Booking...' : 'Confirm Appointment'}
+        </button>
+        {status.msg && (
+          <div className={`text-sm p-2 rounded ${status.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+            {status.msg}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // --- CLINICIAN DASHBOARD ---
 
 const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, finalReportData, finalReportUrl }: any) => {
@@ -464,6 +540,8 @@ const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, fin
               </div>
             </div>
           )}
+          
+          <BookAppointment patientId={patientProfile.id} />
         </div>
       </div>
     </div>
@@ -553,7 +631,7 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
     try {
       const formData = new FormData();
       formData.append('conversation_id', conversationId);
-      formData.append('user_input_json', JSON.stringify({ answer }));
+      formData.append('user_input_json', JSON.stringify({ answer, patient_profile: patientProfile }));
 
       const response = await fetch('http://127.0.0.1:8000/diagnose/chat', {
         method: 'POST',
@@ -685,11 +763,14 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
 };
 
 export default function App() {
-  const [patientProfile, setPatientProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
-  if (!patientProfile) {
-    return <Auth onLogin={setPatientProfile} />;
+  if (!userProfile) {
+    return <Auth onLogin={setUserProfile} />;
   }
 
-  return <DiagnosticSystem patientProfile={patientProfile} onLogout={() => setPatientProfile(null)} />;
+  if (userProfile.role === 'doctor') {
+    return <DoctorPortal onLogout={() => setUserProfile(null)} doctorProfile={userProfile} />;}
+
+  return <DiagnosticSystem patientProfile={userProfile} onLogout={() => setUserProfile(null)} />;
 }
