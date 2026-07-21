@@ -2,8 +2,6 @@
 """
 AI Diagnostic Assistant — LangGraph State Machine
 --------------------------------------------------
-Changes from original
-~~~~~~~~~~~~~~~~~~~~~
 - PatientState gains an `interview_state` field (the persistent memory object)
 - `initialize_chat_node` is removed; question generation is now fully dynamic
   via `ask_one_question_node` which calls the LLM on every turn.
@@ -69,9 +67,8 @@ class PatientState(TypedDict, total=False):
     raw_input: Dict[str, Any]
     structured_input: Dict[str, Any]
     messages: List[Dict[str, Any]]
-    # interview_state replaces question_queue + pending_question logic
     interview_state: Dict[str, Any]
-    pending_question: Optional[str]       # surfaced to the API layer
+    pending_question: Optional[str]      
     diagnosis_path: str
     final_analysis: Dict[str, Any]
     report_path: str

@@ -208,7 +208,7 @@ async def chat(
                 graph_with_checkpoint.update_state,
                 config,
                 current_values,
-                as_node="extract_memory",  # <-- THIS IS THE KEY FIX
+                as_node="extract_memory",
             )
 
             graph_input = None  # Resume from checkpoint
