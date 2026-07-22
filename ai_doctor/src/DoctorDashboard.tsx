@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { User, Activity, FileText, MessageSquare, Zap, Loader2, Send, CheckCircle, Pill, Plus } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
-const renderFormattedText = (text: string) => {
-  const parts = text.split(/(\*\*.*?\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>;
-    }
-    return <span key={i}>{part}</span>;
-  });
-};
+const QUESTION_POOL = [
+  "Which medicine are they taking?",
+  "What did I provide previously?",
+  "Summarize medical history",
+  "Are there any allergies?",
+  "Has the patient had recent surgeries?",
+  "What is the family medical history?",
+  "Are there any known chronic conditions?",
+  "When was their last blood test?",
+  "Do they have any dietary restrictions?",
+  "Have they experienced weight loss?",
+  "Any history of heart disease?"
+];
 
 export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment: any, doctorId: number, onBack: () => void }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [fastSummary, setFastSummary] = useState<string | null>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+  const [presetQuestions, setPresetQuestions] = useState([
+    "Which medicine are they taking?",
+    "What did I provide previously?",
+    "Summarize medical history"
+  ]);
   
   // AI Assistant state
   const [chatMessages, setChatMessages] = useState<{sender: 'ai' | 'doctor', text: string}[]>([]);
@@ -195,15 +205,8 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
                   <Activity className="text-indigo-500" /> AI Clinical Brief
                 </h3>
                 {fastSummary ? (
-                  <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
-                    <ul className="space-y-3">
-                      {fastSummary.split('\n').filter(line => line.trim()).map((line, i) => (
-                        <li key={i} className="flex items-start gap-3 text-gray-800 text-[15px] leading-relaxed">
-                          <div className="mt-2 w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                          <span>{renderFormattedText(line.replace(/^[-*•]\s*/, ''))}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100 prose prose-sm prose-indigo max-w-none text-gray-800 break-words leading-relaxed overflow-hidden">
+                    <ReactMarkdown>{fastSummary}</ReactMarkdown>
                   </div>
                 ) : (
                   <div className="text-center py-12 text-gray-400">
@@ -337,7 +340,13 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
             {chatMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.sender === 'doctor' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${msg.sender === 'doctor' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white border text-gray-800 rounded-bl-none shadow-sm'}`}>
-                  {msg.text}
+                  {msg.sender === 'doctor' ? (
+                    msg.text
+                  ) : (
+                    <div className="prose prose-sm prose-indigo max-w-none leading-relaxed">
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -351,10 +360,25 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
           </div>
           
           <div className="bg-white p-3 border-t flex flex-col gap-2">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              <button onClick={() => { setQuery("Which medicine is the patient taking?"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Which medicine are they taking?</button>
-              <button onClick={() => { setQuery("What medicine did I provide?"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">What did I provide previously?</button>
-              <button onClick={() => { setQuery("Summarize medical history"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Summarize history</button>
+            <div className="flex flex-col gap-2 overflow-y-auto max-h-32 mb-1 scrollbar-hide">
+              {presetQuestions.map((q, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => { 
+                    setQuery(q);
+                    setPresetQuestions(prev => {
+                      const available = QUESTION_POOL.filter(p => !prev.includes(p));
+                      if (available.length === 0) return prev;
+                      const nextQ = available[Math.floor(Math.random() * available.length)];
+                      return prev.map((item, i) => i === idx ? nextQ : item);
+                    });
+                    setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); 
+                  }} 
+                  className="text-left text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded hover:bg-indigo-100 transition-colors border border-indigo-100 shadow-sm"
+                >
+                  {q}
+                </button>
+              ))}
             </div>
             <div className="relative flex items-center">
               <input 

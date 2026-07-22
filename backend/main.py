@@ -219,9 +219,17 @@ async def chat(
                 file_paths["health_record"] = fp
 
             patient_data["files"] = file_paths
+            
+            patient_profile = user_input.get("patient_profile")
+            if patient_profile and "id" in patient_profile:
+                db_prescriptions = db.query(Prescription).filter(Prescription.patient_id == patient_profile["id"]).all()
+                if db_prescriptions:
+                    meds = [f"{p.medicine_name} ({p.frequency})" for p in db_prescriptions]
+                    patient_profile["prescriptions"] = ", ".join(meds)
+                    
             graph_input = {
                 "raw_input": patient_data,
-                "patient_profile": user_input.get("patient_profile")
+                "patient_profile": patient_profile
             }
 
         # ------------------------------------------------------------------
@@ -284,6 +292,22 @@ async def chat(
                         report_data=json.dumps(final_report_data)
                     )
                     db.add(new_report)
+                    
+                    db_patient = db.query(PatientProfile).filter(PatientProfile.id == patient_profile["id"]).first()
+                    if db_patient and interview_state_final and "known_facts" in interview_state_final:
+                        for key, val in interview_state_final["known_facts"].items():
+                            k_lower = key.lower()
+                            if "allerg" in k_lower or "chronic" in k_lower or "condition" in k_lower:
+                                current = db_patient.pre_existing_conditions or ""
+                                new_val = f"{key.replace('_', ' ').title()}: {val}"
+                                if new_val not in current:
+                                    db_patient.pre_existing_conditions = f"{current}; {new_val}".strip("; ")
+                            elif "family" in k_lower:
+                                current = db_patient.family_history or ""
+                                new_val = f"{key.replace('_', ' ').title()}: {val}"
+                                if new_val not in current:
+                                    db_patient.family_history = f"{current}; {new_val}".strip("; ")
+
                     db.commit()
             except (FileNotFoundError, json.JSONDecodeError) as e:
                 print(f"--- ❌ Error reading report JSON: {e} ---")

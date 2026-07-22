@@ -88,6 +88,7 @@ def format_patient_profile(profile: Optional[Dict[str, Any]]) -> str:
     Blood Group: {profile.get('blood_group', 'Unknown')}
     Pre-existing Conditions: {profile.get('pre_existing_conditions', 'None')}
     Family History: {profile.get('family_history', 'None')}
+    Prescriptions: {profile.get('prescriptions', 'None')}
     """
 
 
