@@ -152,10 +152,12 @@ Decide whether to ask ONE more clarifying question or to end the interview.
     symptoms, medications, allergies, family history, lifestyle — things  
     the patient can answer from memory, not things requiring paperwork.
 
-5.  If you have enough information to form a reasonable preliminary  
+5.  If the patient has past prescriptions listed in their profile, and you haven't yet, you MUST ask at least one follow-up question regarding their current usage of that medication or potential side effects.
+
+6.  If you have enough information to form a reasonable preliminary  
     assessment (even if imperfect), set status to "sufficient".
 
-6.  If the turn count is 8 or more, you MUST set status to "sufficient"  
+7.  If the turn count is 8 or more, you MUST set status to "sufficient"  
     regardless of completeness — do not loop indefinitely.
 
 **Output Format — ONLY a single JSON object:**
