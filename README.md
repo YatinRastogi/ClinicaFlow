@@ -96,19 +96,3 @@ BASE_URL=http://127.0.0.1:8000
 ```
 
 ---
-
-## 🔮 Future Enhancements
-
-* Multi-language support for patient interaction
-* Integration with wearable devices (IoT vitals)
-* Advanced disease prediction models
-* Blockchain-based medical record security
-
----
-
-## 👥 Contributors
-
-* Vasu Tyagi
-* Yatin Rastogi
-* Shubh 
-* Raman
