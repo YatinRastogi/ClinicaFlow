@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { User, Activity, FileText, MessageSquare, Zap, Loader2, Send } from 'lucide-react';
+import { User, Activity, FileText, MessageSquare, Zap, Loader2, Send, CheckCircle } from 'lucide-react';
+
+const renderFormattedText = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
 
 export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onBack: () => void }) => {
   const [activeTab, setActiveTab] = useState('summary');
@@ -34,6 +44,19 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
     }
   };
 
+  const [isCompleting, setIsCompleting] = useState(false);
+  const handleCompleteAppointment = async () => {
+    setIsCompleting(true);
+    try {
+      await fetch(`http://127.0.0.1:8000/api/appointments/${appointment.appointment_id}/complete`, { method: 'PUT' });
+      onBack(); // Return to dashboard, which should refresh and hide it
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
   const handleAskQuestion = async () => {
     if (!query.trim()) return;
     const currentQuery = query;
@@ -64,7 +87,9 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
       {/* Patient Header */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between shadow-sm z-10">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="md:hidden text-indigo-600 font-medium">← Back</button>
+          <button onClick={onBack} className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg mr-2">
+            ← Back
+          </button>
           <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
             <User size={24} />
           </div>
@@ -77,14 +102,24 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
             </div>
           </div>
         </div>
-        <button 
-          onClick={handleGenerateSummary}
-          disabled={isLoadingSummary}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium transition-all"
-        >
-          {isLoadingSummary ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
-          Generate Fast AI Summary
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={handleCompleteAppointment}
+            disabled={isCompleting}
+            className="flex items-center gap-2 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 px-4 py-2.5 rounded-lg shadow-sm font-medium transition-all"
+          >
+            {isCompleting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
+            Complete
+          </button>
+          <button 
+            onClick={handleGenerateSummary}
+            disabled={isLoadingSummary}
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium transition-all"
+          >
+            {isLoadingSummary ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+            Generate Fast AI Summary
+          </button>
+        </div>
       </div>
 
       {/* Split View */}
@@ -119,8 +154,15 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
                   <Activity className="text-indigo-500" /> AI Clinical Brief
                 </h3>
                 {fastSummary ? (
-                  <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100 prose prose-indigo">
-                    <pre className="whitespace-pre-wrap font-sans text-gray-700">{fastSummary}</pre>
+                  <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
+                    <ul className="space-y-3">
+                      {fastSummary.split('\n').filter(line => line.trim()).map((line, i) => (
+                        <li key={i} className="flex items-start gap-3 text-gray-800 text-[15px] leading-relaxed">
+                          <div className="mt-2 w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                          <span>{renderFormattedText(line.replace(/^[-*•]\s*/, ''))}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ) : (
                   <div className="text-center py-12 text-gray-400">

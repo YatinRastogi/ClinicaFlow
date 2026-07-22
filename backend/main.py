@@ -358,6 +358,24 @@ def book_appointment(appt: AppointmentCreate, db: Session = Depends(get_db)):
     db.refresh(new_appt)
     return {"message": "Appointment booked", "appointment_id": new_appt.id}
 
+@app.put("/api/appointments/{appointment_id}/complete")
+def complete_appointment(appointment_id: int, db: Session = Depends(get_db)):
+    appt = db.query(Appointment).filter(Appointment.id == appointment_id).first()
+    if not appt:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    appt.status = "Completed"
+    db.commit()
+    return {"message": "Appointment completed"}
+
+@app.get("/api/doctors/{doctor_id}/booked-slots")
+def get_booked_slots(doctor_id: int, db: Session = Depends(get_db)):
+    appts = db.query(Appointment).filter(Appointment.doctor_id == doctor_id, Appointment.status == "Scheduled").all()
+    # Return in format "HH:MM"
+    # Local time offset logic might vary, but since backend stores naive UTC and we book today,
+    # let's just return the UTC hour offset so the frontend can compare.
+    # Actually, we can return the exact ISO strings, and the frontend will format them to HH:MM.
+    return {"booked_slots": [(a.appointment_time.isoformat() + "Z") for a in appts]}
+
 @app.get("/api/doctors/{doctor_id}/schedule")
 def get_doctor_schedule(doctor_id: int, db: Session = Depends(get_db)):
     appointments = db.query(Appointment).filter(Appointment.doctor_id == doctor_id).all()

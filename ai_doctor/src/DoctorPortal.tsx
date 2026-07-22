@@ -6,7 +6,6 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
   const [schedule, setSchedule] = useState<any[]>([]);
   const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'patients'>('dashboard');
 
   useEffect(() => {
     fetchSchedule();
@@ -39,11 +38,11 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
           </div>
           
           <nav className="space-y-2">
-            <button onClick={() => setActiveMenu('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeMenu === 'dashboard' ? 'bg-indigo-800 text-indigo-100' : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'}`}>
+            <button 
+              onClick={() => { setSelectedAppointment(null); fetchSchedule(); }} 
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium bg-indigo-800 text-indigo-100 hover:bg-indigo-700 transition-colors"
+            >
               <LayoutDashboard size={20} /> Dashboard
-            </button>
-            <button onClick={() => setActiveMenu('patients')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeMenu === 'patients' ? 'bg-indigo-800 text-indigo-100' : 'text-indigo-200 hover:bg-indigo-800 hover:text-white'}`}>
-              <Users size={20} /> My Patients
             </button>
           </nav>
         </div>
@@ -62,36 +61,40 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
       {selectedAppointment ? (
         <DoctorDashboard 
           appointment={selectedAppointment} 
-          onBack={() => setSelectedAppointment(null)} 
+          onBack={() => {
+            setSelectedAppointment(null);
+            fetchSchedule();
+          }} 
         />
-      ) : (
+      ) : (() => {
+        const dashboardAppointments = schedule.filter(a => a.status !== 'Completed');
+        const uniquePatients = Array.from(new Map(schedule.filter(a => a.patient).map(appt => [appt.patient.id, appt.patient])).values());
+
+        return (
         <div className="flex-1 flex flex-col overflow-y-auto">
-          <header className="bg-white border-b px-8 py-6">
+          <header className="bg-white border-b px-8 py-6 shrink-0">
             <h1 className="text-2xl font-bold text-gray-800">Welcome, {doctorProfile.name}</h1>
-            <p className="text-gray-500 mt-1">Here is your {activeMenu === 'dashboard' ? 'schedule for today' : 'patient list'}.</p>
+            <p className="text-gray-500 mt-1">Here is your daily overview and patient directory.</p>
           </header>
 
-          <div className="p-8">
+          <div className="p-8 space-y-8">
+            {/* Appointments Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
                 <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-                  {activeMenu === 'dashboard' ? (
-                    <><Calendar size={18} className="text-indigo-500" /> Today's Appointments</>
-                  ) : (
-                    <><Users size={18} className="text-indigo-500" /> All Patients</>
-                  )}
+                  <Calendar size={18} className="text-indigo-500" /> Today's Appointments
                 </h2>
               </div>
               
               {isLoading ? (
                 <div className="p-12 text-center text-gray-500">Loading...</div>
-              ) : schedule.length === 0 ? (
+              ) : dashboardAppointments.length === 0 ? (
                 <div className="p-12 text-center text-gray-500">
-                  <p>No data available.</p>
+                  <p>No active appointments for today.</p>
                 </div>
-              ) : activeMenu === 'dashboard' ? (
+              ) : (
                 <div className="divide-y divide-gray-100">
-                  {schedule.map((appt, index) => (
+                  {dashboardAppointments.map((appt, index) => (
                     <div 
                       key={index} 
                       onClick={() => setSelectedAppointment(appt)}
@@ -119,10 +122,26 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
                     </div>
                   ))}
                 </div>
+              )}
+            </div>
+
+            {/* Patients Directory Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <h2 className="font-semibold text-gray-700 flex items-center gap-2">
+                  <Users size={18} className="text-indigo-500" /> Patient Directory
+                </h2>
+              </div>
+              
+              {isLoading ? (
+                <div className="p-12 text-center text-gray-500">Loading...</div>
+              ) : uniquePatients.length === 0 ? (
+                <div className="p-12 text-center text-gray-500">
+                  <p>No patients found.</p>
+                </div>
               ) : (
                 <div className="divide-y divide-gray-100">
-                  {/* Derive unique patients from schedule */}
-                  {Array.from(new Map(schedule.map(appt => [appt.patient.id, appt.patient])).values()).map((patient: any, index) => (
+                  {uniquePatients.map((patient: any, index) => (
                     <div key={index} className="p-6 flex items-center justify-between hover:bg-indigo-50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">
@@ -140,7 +159,8 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

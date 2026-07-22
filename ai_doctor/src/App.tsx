@@ -278,6 +278,7 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [status, setStatus] = useState<{type: 'idle' | 'loading' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   React.useEffect(() => {
     fetch('http://127.0.0.1:8000/api/doctors')
@@ -285,6 +286,23 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
       .then(data => setDoctors(data.doctors || []))
       .catch(() => setStatus({type: 'error', msg: 'Failed to load doctors'}));
   }, []);
+
+  React.useEffect(() => {
+    if (!selectedDoctor) {
+      setBookedSlots([]);
+      return;
+    }
+    fetch(`http://127.0.0.1:8000/api/doctors/${selectedDoctor}/booked-slots`)
+      .then(res => res.json())
+      .then(data => {
+        const booked = (data.booked_slots || []).map((iso: string) => {
+          const d = new Date(iso);
+          return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+        });
+        setBookedSlots(booked);
+      })
+      .catch(() => setBookedSlots([]));
+  }, [selectedDoctor]);
 
   const handleBook = async () => {
     if (!selectedDoctor || !selectedTime) return;
@@ -328,7 +346,10 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
           <label className="block text-sm text-gray-600 mb-1">Select Time (Today)</label>
           <select className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" value={selectedTime} onChange={e => setSelectedTime(e.target.value)}>
             <option value="">-- Choose Time --</option>
-            {availableSlots.map(t => <option key={t} value={t}>{t}</option>)}
+            {availableSlots.map(t => {
+              const isBooked = bookedSlots.includes(t);
+              return <option key={t} value={t} disabled={isBooked}>{t} {isBooked ? '(Booked)' : ''}</option>;
+            })}
           </select>
         </div>
         <button 
