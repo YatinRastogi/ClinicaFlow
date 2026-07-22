@@ -24,7 +24,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import bcrypt
 
-from database.models import SessionLocal, PatientProfile, DoctorProfile, Appointment, MedicalReport, engine
+from database.models import SessionLocal, PatientProfile, DoctorProfile, Appointment, MedicalReport, Prescription, engine
 
 from langgraph_logic import graph_with_checkpoint
 from utils.interview_memory import make_interview_state
@@ -319,6 +319,12 @@ class RagQaRequest(BaseModel):
     patient_id: int
     query: str
 
+class PrescriptionCreate(BaseModel):
+    doctor_id: int
+    patient_id: int
+    medicine_name: str
+    frequency: str
+
 @app.get("/api/doctors")
 def get_doctors(db: Session = Depends(get_db)):
     doctors = db.query(DoctorProfile).all()
@@ -449,12 +455,19 @@ def rag_qa(request: RagQaRequest, db: Session = Depends(get_db)):
             pass
             
     reports_str = "\n".join(reports_context) if reports_context else "No past reports available."
+    
+    prescriptions = db.query(Prescription).filter(Prescription.patient_id == patient.id).all()
+    prescriptions_context = []
+    for p in prescriptions:
+        prescriptions_context.append(f"Date: {p.date_given.isoformat()} - Medicine: {p.medicine_name}, Frequency: {p.frequency}")
+    
+    prescriptions_str = "\n".join(prescriptions_context) if prescriptions_context else "No previous medicines prescribed."
         
     from utils.llm import llm
     from langchain_core.messages import HumanMessage
     
     # In a real scenario, this would query ChromaDB. For this iteration, we use the LLM directly with context.
-    context = f"Patient {patient.name}, Age {patient.age}, Conditions: {patient.pre_existing_conditions}.\nPast Reports:\n{reports_str}"
+    context = f"Patient {patient.name}, Age {patient.age}, Conditions: {patient.pre_existing_conditions}.\nPast Reports:\n{reports_str}\nPrevious Medicines:\n{prescriptions_str}"
     prompt = f"Context: {context}\nDoctor's Query: {request.query}\nAnswer the query concisely based on the context."
     
     try:
@@ -464,3 +477,34 @@ def rag_qa(request: RagQaRequest, db: Session = Depends(get_db)):
         answer = f"I am unable to answer this right now. Error: {e}"
         
     return {"query": request.query, "answer": answer}
+
+# ---------------------------------------------------------------------------
+# Prescription Endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/api/prescriptions")
+def assign_prescription(prescription: PrescriptionCreate, db: Session = Depends(get_db)):
+    new_prescription = Prescription(
+        patient_id=prescription.patient_id,
+        doctor_id=prescription.doctor_id,
+        medicine_name=prescription.medicine_name,
+        frequency=prescription.frequency
+    )
+    db.add(new_prescription)
+    db.commit()
+    db.refresh(new_prescription)
+    return {"message": "Medicine assigned successfully", "prescription_id": new_prescription.id}
+
+@app.get("/api/patients/{patient_id}/prescriptions")
+def get_patient_prescriptions(patient_id: int, db: Session = Depends(get_db)):
+    prescriptions = db.query(Prescription).filter(Prescription.patient_id == patient_id).order_by(Prescription.date_given.desc()).all()
+    return {
+        "prescriptions": [
+            {
+                "id": p.id,
+                "medicine_name": p.medicine_name,
+                "frequency": p.frequency,
+                "date_given": p.date_given.isoformat() + "Z"
+            } for p in prescriptions
+        ]
+    }

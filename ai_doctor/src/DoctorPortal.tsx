@@ -61,6 +61,7 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
       {selectedAppointment ? (
         <DoctorDashboard 
           appointment={selectedAppointment} 
+          doctorId={doctorProfile.id}
           onBack={() => {
             setSelectedAppointment(null);
             fetchSchedule();

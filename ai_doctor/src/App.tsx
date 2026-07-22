@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import {
   Heart, Thermometer, Activity, Upload, FileText, User, Stethoscope, TrendingUp,
-  AlertTriangle, Shield, Plus, X, Loader2, CheckCircle, Calendar
+  AlertTriangle, Shield, Plus, X, Loader2, CheckCircle, Calendar, Pill, History
 } from 'lucide-react';
 import { ChatPanel } from './ChatPanel';
 import { Auth } from './Auth';
@@ -572,7 +572,7 @@ const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, fin
 // --- MAIN PARENT COMPONENT ---
 
 const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, onLogout: () => void }) => {
-  const [activeTab, setActiveTab] = useState('patient');
+  const [activeTab, setActiveTab] = useState('book');
   const [symptoms, setSymptoms] = useState<{ name: string; duration: string; severity: string }[]>([]);
   const [vitals, setVitals] = useState({ temperature: '', bp_systolic: '', bp_diastolic: '', spo2: '', pulse: '', respiratory_rate: '' });
   const [patientData, setPatientData] = useState({ weight: '', height: '' });
@@ -587,6 +587,23 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
   const [finalReport, setFinalReport] = useState<any | null>(null);
   const [finalReportUrl, setFinalReportUrl] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  const [pastReports, setPastReports] = useState<any[]>([]);
+  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (activeTab === 'history') {
+      fetch(`http://127.0.0.1:8000/api/patients/${patientProfile.id}/reports`)
+        .then(res => res.json())
+        .then(data => setPastReports(data.reports || []))
+        .catch(err => console.error(err));
+    } else if (activeTab === 'prescriptions') {
+      fetch(`http://127.0.0.1:8000/api/patients/${patientProfile.id}/prescriptions`)
+        .then(res => res.json())
+        .then(data => setPrescriptions(data.prescriptions || []))
+        .catch(err => console.error(err));
+    }
+  }, [activeTab, patientProfile.id]);
 
   const handleStartConversation = async () => {
     if (isLoading) return; // Prevent double-submit
@@ -695,25 +712,44 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
           <div className="flex items-center justify-between">
             <nav className="flex space-x-8" aria-label="Tabs">
               <button
-                onClick={() => setActiveTab('patient')}
+                onClick={() => setActiveTab('book')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'patient'
+                  activeTab === 'book'
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Patient Input
+                Book Appointment
               </button>
               <button
-                onClick={() => setActiveTab('results')}
+                onClick={() => setActiveTab('patient')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'results'
+                  activeTab === 'patient' || activeTab === 'results'
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Diagnostic Results
-                {finalReport && <span className="ml-2 bg-green-500 text-white text-xs rounded-full px-2 py-0.5">Ready</span>}
+                AI Diagnosis
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'history'
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Past Reports
+              </button>
+              <button
+                onClick={() => setActiveTab('prescriptions')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'prescriptions'
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                My Prescriptions
               </button>
             </nav>
             <div className="flex items-center gap-4">
@@ -745,7 +781,63 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
       )}
 
       {/* Content Area */}
-      {activeTab === 'patient' ? (
+      {activeTab === 'book' && (
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Schedule an Appointment</h2>
+          <BookAppointment patientId={patientProfile.id} />
+        </div>
+      )}
+
+      {activeTab === 'history' && (
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><History className="text-indigo-500" /> My Past Reports</h2>
+          {pastReports.length === 0 ? (
+            <p className="text-gray-500 bg-white p-6 rounded-lg text-center border">You have no past reports.</p>
+          ) : (
+            <div className="space-y-4">
+              {pastReports.map((report, idx) => (
+                <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center">
+                  <div>
+                    <h3 className="font-semibold text-gray-800">Report from {new Date(report.created_at).toLocaleDateString()}</h3>
+                    <p className="text-sm text-gray-500">Diagnosis: {report.data?.final_analysis?.analysis?.probable_diagnosis?.condition || 'N/A'}</p>
+                  </div>
+                  {report.url && (
+                    <a href={report.url} target="_blank" rel="noreferrer" className="text-indigo-600 font-medium hover:underline flex items-center gap-1">
+                      <FileText size={16} /> View PDF
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'prescriptions' && (
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><Pill className="text-indigo-500" /> My Prescriptions</h2>
+          {prescriptions.length === 0 ? (
+            <p className="text-gray-500 bg-white p-6 rounded-lg text-center border">No medicines prescribed.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {prescriptions.map((p, idx) => (
+                <div key={idx} className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="bg-indigo-100 p-2 rounded-full text-indigo-600"><Pill size={20} /></div>
+                    <h3 className="font-bold text-gray-800 text-lg">{p.medicine_name}</h3>
+                  </div>
+                  <div className="text-gray-600 space-y-1">
+                    <p><span className="font-medium">Frequency:</span> {p.frequency}</p>
+                    <p><span className="font-medium">Date Given:</span> {new Date(p.date_given).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'patient' && (
         <PatientInputForm
           patientData={patientData}
           setPatientData={setPatientData}
@@ -760,7 +852,9 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
           onGenerateReport={handleStartConversation}
           isLoading={isLoading}
         />
-      ) : (
+      )}
+
+      {activeTab === 'results' && (
         <ClinicianDashboard
           patientProfile={patientProfile}
           patientData={patientData}

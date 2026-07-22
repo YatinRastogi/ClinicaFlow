@@ -26,6 +26,7 @@ class PatientProfile(Base):
     
     appointments = relationship("Appointment", back_populates="patient")
     reports = relationship("MedicalReport", back_populates="patient")
+    prescriptions = relationship("Prescription", back_populates="patient")
 
 class DoctorProfile(Base):
     __tablename__ = "doctors"
@@ -37,6 +38,7 @@ class DoctorProfile(Base):
     specialty = Column(String) # 'Cardiology' or 'General Medicine'
     
     appointments = relationship("Appointment", back_populates="doctor")
+    prescriptions = relationship("Prescription", back_populates="doctor")
 
 class Appointment(Base):
     __tablename__ = "appointments"
@@ -60,6 +62,20 @@ class MedicalReport(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     
     patient = relationship("PatientProfile", back_populates="reports")
+
+# Create the tables in the database
+class Prescription(Base):
+    __tablename__ = "prescriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("patients.id"))
+    doctor_id = Column(Integer, ForeignKey("doctors.id"))
+    medicine_name = Column(String, index=True)
+    frequency = Column(String)
+    date_given = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    patient = relationship("PatientProfile", back_populates="prescriptions")
+    doctor = relationship("DoctorProfile", back_populates="prescriptions")
 
 # Create the tables in the database
 Base.metadata.create_all(bind=engine)

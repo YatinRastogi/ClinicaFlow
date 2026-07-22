@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Activity, FileText, MessageSquare, Zap, Loader2, Send, CheckCircle } from 'lucide-react';
+import { User, Activity, FileText, MessageSquare, Zap, Loader2, Send, CheckCircle, Pill, Plus } from 'lucide-react';
 
 const renderFormattedText = (text: string) => {
   const parts = text.split(/(\*\*.*?\*\*)/g);
@@ -11,7 +11,7 @@ const renderFormattedText = (text: string) => {
   });
 };
 
-export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onBack: () => void }) => {
+export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment: any, doctorId: number, onBack: () => void }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [fastSummary, setFastSummary] = useState<string | null>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
@@ -21,13 +21,48 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
   const [query, setQuery] = useState('');
   const [isAsking, setIsAsking] = useState(false);
   const [pastReports, setPastReports] = useState<any[]>([]);
+  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [newMedicineName, setNewMedicineName] = useState('');
+  const [newMedicineFrequency, setNewMedicineFrequency] = useState('Twice a day');
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  const fetchPrescriptions = () => {
+    fetch(`http://127.0.0.1:8000/api/patients/${appointment.patient.id}/prescriptions`)
+      .then(res => res.json())
+      .then(data => setPrescriptions(data.prescriptions || []))
+      .catch(err => console.error("Failed to load prescriptions", err));
+  };
 
   React.useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/patients/${appointment.patient.id}/reports`)
       .then(res => res.json())
       .then(data => setPastReports(data.reports || []))
       .catch(err => console.error("Failed to load reports", err));
+    fetchPrescriptions();
   }, [appointment.patient.id]);
+
+  const handleAssignMedicine = async () => {
+    if (!newMedicineName.trim()) return;
+    setIsAssigning(true);
+    try {
+      await fetch(`http://127.0.0.1:8000/api/prescriptions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patient_id: appointment.patient.id,
+          doctor_id: doctorId,
+          medicine_name: newMedicineName.trim(),
+          frequency: newMedicineFrequency
+        })
+      });
+      setNewMedicineName('');
+      fetchPrescriptions();
+    } catch(e) {
+      console.error(e);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
 
   const handleGenerateSummary = async () => {
     setIsLoadingSummary(true);
@@ -146,6 +181,12 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
             >
               Past Reports
             </button>
+            <button 
+              onClick={() => setActiveTab('prescriptions')}
+              className={`px-4 py-2 font-medium text-sm rounded-t-lg transition-colors ${activeTab === 'prescriptions' ? 'bg-white text-indigo-600 border-t border-x' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Prescriptions
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto p-6">
             {activeTab === 'summary' && (
@@ -216,6 +257,67 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
                 )}
               </div>
             )}
+            {activeTab === 'prescriptions' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Pill className="text-indigo-500" /> Prescriptions & Medicines
+                </h3>
+                
+                <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100">
+                  <h4 className="font-semibold text-indigo-900 mb-3 text-sm uppercase tracking-wide">Assign New Medicine</h4>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="Medicine Name (e.g. Amoxicillin 500mg)" 
+                      value={newMedicineName}
+                      onChange={(e) => setNewMedicineName(e.target.value)}
+                      className="flex-1 p-2 border border-indigo-200 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <select 
+                      value={newMedicineFrequency}
+                      onChange={(e) => setNewMedicineFrequency(e.target.value)}
+                      className="p-2 border border-indigo-200 rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-700"
+                    >
+                      <option value="Once a day">Once a day</option>
+                      <option value="Twice a day">Twice a day</option>
+                      <option value="Morning and night">Morning and night</option>
+                      <option value="Every 8 hours">Every 8 hours</option>
+                      <option value="As needed">As needed</option>
+                    </select>
+                    <button 
+                      onClick={handleAssignMedicine}
+                      disabled={!newMedicineName.trim() || isAssigning}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2 justify-center"
+                    >
+                      {isAssigning ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                      Assign
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-700 mb-2">Previous Medicines</h4>
+                  {prescriptions.length === 0 ? (
+                    <p className="text-gray-500 text-sm">No medicines assigned yet.</p>
+                  ) : (
+                    prescriptions.map((p, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <div>
+                          <div className="font-medium text-gray-800 flex items-center gap-2">
+                            <Pill size={16} className="text-gray-400" />
+                            {p.medicine_name}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">Frequency: {p.frequency}</div>
+                        </div>
+                        <div className="text-sm text-gray-400">
+                          {new Date(p.date_given).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -248,7 +350,12 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
             )}
           </div>
           
-          <div className="bg-white p-3 border-t">
+          <div className="bg-white p-3 border-t flex flex-col gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <button onClick={() => { setQuery("Which medicine is the patient taking?"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Which medicine are they taking?</button>
+              <button onClick={() => { setQuery("What medicine did I provide?"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">What did I provide previously?</button>
+              <button onClick={() => { setQuery("Summarize medical history"); setTimeout(() => document.getElementById('ai-send-btn')?.click(), 50); }} className="text-xs whitespace-nowrap bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">Summarize history</button>
+            </div>
             <div className="relative flex items-center">
               <input 
                 type="text" 
@@ -259,6 +366,7 @@ export const DoctorDashboard = ({ appointment, onBack }: { appointment: any, onB
                 className="w-full bg-gray-100 rounded-full py-2 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <button 
+                id="ai-send-btn"
                 onClick={handleAskQuestion}
                 className="absolute right-2 text-indigo-600 hover:text-indigo-800 p-1"
               >
