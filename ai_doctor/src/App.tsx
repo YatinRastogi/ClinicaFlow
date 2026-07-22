@@ -9,6 +9,10 @@ import { DoctorPortal } from './DoctorPortal';
 
 // --- CHILD COMPONENTS ---
 
+/**
+ * The PatientInputForm component renders the initial intake form where patients can provide
+ * their basic information, symptoms, vitals, and upload previous medical reports.
+ */
 const PatientInputForm = ({
   patientData, setPatientData,
   symptoms, setSymptoms,
@@ -273,6 +277,10 @@ const PatientInputForm = ({
   );
 };
 
+/**
+ * The BookAppointment component allows patients to browse available doctors and book an 
+ * appointment slot. It dynamically fetches booked slots to prevent double-booking.
+ */
 const BookAppointment = ({ patientId }: { patientId: number }) => {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
@@ -371,6 +379,10 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
 
 // --- CLINICIAN DASHBOARD ---
 
+/**
+ * The ClinicianDashboard component displays the AI's diagnostic results, differential 
+ * diagnoses, and a summary of the patient's inputs and interview results.
+ */
 const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, finalReportData, finalReportUrl }: any) => {
   const calculateBMI = () => {
     if (patientData.weight && patientData.height) {
@@ -571,6 +583,11 @@ const ClinicianDashboard = ({ patientProfile, patientData, vitals, symptoms, fin
 
 // --- MAIN PARENT COMPONENT ---
 
+/**
+ * The DiagnosticSystem is the main parent component for the patient-facing portal.
+ * It manages state for the patient dashboard tabs, the AI diagnostic chat process, 
+ * and handles interactions with the backend API.
+ */
 const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, onLogout: () => void }) => {
   const [activeTab, setActiveTab] = useState('book');
   const [symptoms, setSymptoms] = useState<{ name: string; duration: string; severity: string }[]>([]);
@@ -877,6 +894,10 @@ const DiagnosticSystem = ({ patientProfile, onLogout }: { patientProfile: any, o
   );
 };
 
+/**
+ * The main entry point for the frontend application. Handles top-level routing
+ * based on user authentication status and role (patient vs doctor).
+ */
 export default function App() {
   const [userProfile, setUserProfile] = useState<any>(null);
 

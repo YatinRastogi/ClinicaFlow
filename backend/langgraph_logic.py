@@ -79,6 +79,7 @@ class PatientState(TypedDict, total=False):
     patient_profile: Dict[str, Any]
 
 def format_patient_profile(profile: Optional[Dict[str, Any]]) -> str:
+    """Formats the patient profile dictionary into a readable string for the LLM prompt."""
     if not profile:
         return "No permanent profile found."
     return f"""
@@ -97,6 +98,7 @@ def format_patient_profile(profile: Optional[Dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 
 def extract_text_from_pdf(pdf_path: str) -> str:
+    """Extracts raw text from a given PDF file using PyMuPDF."""
     if not os.path.exists(pdf_path):
         return "File not found."
     doc = fitz.open(pdf_path)
@@ -104,6 +106,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 
 
 def summarize_lab_report(pdf_path: str) -> Dict[str, Any]:
+    """Uses an LLM to generate a summary of the extracted lab report text."""
     text = extract_text_from_pdf(pdf_path)
     if text == "File not found.":
         return {"error": "Lab report file not found."}
@@ -116,6 +119,7 @@ def summarize_lab_report(pdf_path: str) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def retrieve_context_node(state: PatientState) -> Dict[str, Any]:
+    """Retrieves relevant medical guidelines (RAG) based on symptoms and extracted facts."""
     print("--- 📚 RETRIEVING SPECIALTY GUIDELINES (RAG) ---")
     specialty = state.get("diagnosis_path", "general_medicine")
 
@@ -143,6 +147,7 @@ def retrieve_context_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def _clean_and_parse(raw: str) -> Dict[str, Any]:
+    """Strips markdown formatting from the LLM output and parses it into a JSON dictionary."""
     raw = raw.strip()
     # Strip common markdown fences
     if raw.startswith("```"):
@@ -154,6 +159,7 @@ def _clean_and_parse(raw: str) -> Dict[str, Any]:
 
 
 def _conversation_history_text(messages: List[Dict[str, Any]]) -> str:
+    """Formats the conversation messages into a plain text transcript."""
     return "\n".join(
         f"{msg['role'].upper()}: {msg['content']}" for msg in messages
     )
@@ -164,6 +170,7 @@ def _conversation_history_text(messages: List[Dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 
 def preprocess_node(state: PatientState) -> Dict[str, Any]:
+    """Initializes the interview state and uses an LLM to structure the raw patient intake data."""
     print("--- DOC: PREPROCESSING INITIAL DATA ---")
     raw = state.get("raw_input", {})
     messages = state.get("messages", [])
@@ -220,6 +227,7 @@ def preprocess_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def process_all_lab_reports_node(state: PatientState) -> Dict[str, Any]:
+    """Processes and summarizes all uploaded lab reports, updating the structured input."""
     print("--- FILE: PROCESSING LAB REPORTS ---")
     files = state.get("raw_input", {}).get("files", {})
     lab_results: Dict[str, Any] = {}
@@ -248,6 +256,7 @@ def process_all_lab_reports_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def refine_questions_node(state: PatientState) -> Dict[str, Any]:
+    """Refines the initial missing information questions based on the lab report summaries."""
     print("--- 🧠 REFINING QUESTIONS BASED ON LABS ---")
     structured_input = state.get("structured_input", {})
     initial_questions = structured_input.get("missing_information", [])
@@ -395,6 +404,7 @@ def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def triage_router_node(state: PatientState) -> Dict[str, Any]:
+    """Routes the patient to the appropriate medical specialist based on their primary complaint."""
     print("--- 📧 TRIAGE ROUTER ---")
     initial_status = {
         "status": "pending",
@@ -425,6 +435,7 @@ def run_specialist_analysis(
     specialist_prompt,
     specialist_llm,
 ) -> Dict[str, Any]:
+    """Runs a specialist LLM to analyze the gathered patient data and interview facts."""
     interview_state = state.get("interview_state", make_interview_state())
     memory_context = build_memory_context_block(interview_state)
     structured_data = json.dumps(state.get("structured_input", {}), indent=2)
@@ -477,16 +488,19 @@ def run_specialist_analysis(
 
 
 def general_medicine_analysis_node(state: PatientState) -> Dict[str, Any]:
+    """Executes the General Medicine specialist analysis."""
     print("--- MED: GENERAL MEDICINE ANALYSIS ---")
     return run_specialist_analysis(state, general_medicine_prompt, general_medicine_llm)
 
 
 def cardiology_analysis_node(state: PatientState) -> Dict[str, Any]:
+    """Executes the Cardiology specialist analysis."""
     print("--- MED: CARDIOLOGY ANALYSIS ---")
     return run_specialist_analysis(state, cardiology_prompt, cardiology_llm)
 
 
 def dermatology_analysis_node(state: PatientState) -> Dict[str, Any]:
+    """Executes the Dermatology specialist analysis."""
     print("--- MED: DERMATOLOGY ANALYSIS ---")
     return run_specialist_analysis(state, dermatology_prompt, dermatology_llm)
 
@@ -496,6 +510,7 @@ def dermatology_analysis_node(state: PatientState) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def generate_report_node(state: PatientState) -> Dict[str, str]:
+    """Compiles all data into a final Medical Report, saves it to a JSON file, and generates a PDF."""
     print("--- ✍️ GENERATING FINAL CLINICIAN REPORT ---")
     structured_input = state.get("structured_input", {})
     has_lab_data = structured_input.get("has_lab_data", False)
@@ -562,6 +577,7 @@ def decide_to_continue_chat(state: PatientState) -> str:
 
 
 def route_to_specialist(state: PatientState) -> str:
+    """Returns the determined specialist path for conditional routing."""
     return cast(str, state.get("diagnosis_path", "general_medicine"))
 
 

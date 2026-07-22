@@ -16,6 +16,10 @@ const QUESTION_POOL = [
   "Any history of heart disease?"
 ];
 
+/**
+ * The DoctorDashboard component provides the main interface for a doctor to review a patient's
+ * medical history, manage prescriptions, and interact with an AI assistant.
+ */
 export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment: any, doctorId: number, onBack: () => void }) => {
   const [activeTab, setActiveTab] = useState('summary');
   const [fastSummary, setFastSummary] = useState<string | null>(null);
@@ -36,6 +40,9 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
   const [newMedicineFrequency, setNewMedicineFrequency] = useState('Twice a day');
   const [isAssigning, setIsAssigning] = useState(false);
 
+  /**
+   * Fetches the list of past prescriptions for the current patient from the backend.
+   */
   const fetchPrescriptions = () => {
     fetch(`http://127.0.0.1:8000/api/patients/${appointment.patient.id}/prescriptions`)
       .then(res => res.json())
@@ -51,6 +58,9 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
     fetchPrescriptions();
   }, [appointment.patient.id]);
 
+  /**
+   * Submits a new prescription to the backend, linking it to the patient and doctor.
+   */
   const handleAssignMedicine = async () => {
     if (!newMedicineName.trim()) return;
     setIsAssigning(true);
@@ -74,6 +84,9 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
     }
   };
 
+  /**
+   * Requests a fast, LLM-generated clinical summary of the patient's medical history.
+   */
   const handleGenerateSummary = async () => {
     setIsLoadingSummary(true);
     try {
@@ -90,6 +103,9 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
   };
 
   const [isCompleting, setIsCompleting] = useState(false);
+  /**
+   * Marks the current appointment as completed and returns to the main dashboard.
+   */
   const handleCompleteAppointment = async () => {
     setIsCompleting(true);
     try {
@@ -102,6 +118,9 @@ export const DoctorDashboard = ({ appointment, doctorId, onBack }: { appointment
     }
   };
 
+  /**
+   * Sends a custom query to the RAG-enabled AI assistant and displays the response.
+   */
   const handleAskQuestion = async () => {
     if (!query.trim()) return;
     const currentQuery = query;
