@@ -46,3 +46,7 @@ backend/test_*.py
 # ==========================
 .DS_Store
 Thumbs.db
+
+# Google OAuth
+backend/token.json
+backend/credentials.json

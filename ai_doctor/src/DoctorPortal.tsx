@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, LayoutDashboard, Settings, LogOut, ChevronRight, Activity } from 'lucide-react';
+import { Calendar, Users, LayoutDashboard, LogOut, Activity, Video } from 'lucide-react';
 import { DoctorDashboard } from './DoctorDashboard';
 
 export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void, doctorProfile: any }) => {
@@ -98,27 +98,53 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
                   {dashboardAppointments.map((appt, index) => (
                     <div 
                       key={index} 
-                      onClick={() => setSelectedAppointment(appt)}
                       className="p-6 flex items-center justify-between hover:bg-indigo-50 cursor-pointer transition-colors"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg">
+                      {/* Left: avatar + patient info — clicking opens the dashboard */}
+                      <div
+                        className="flex items-center gap-4 flex-1 min-w-0"
+                        onClick={() => setSelectedAppointment(appt)}
+                      >
+                        <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg shrink-0">
                           {appt.patient?.name?.charAt(0) || '?'}
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{appt.patient?.name || 'Unknown'}</h3>
-                          <div className="text-sm text-gray-500 flex gap-3 mt-1">
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate">{appt.patient?.name || 'Unknown'}</h3>
+                          <div className="text-sm text-gray-500 flex flex-wrap gap-3 mt-1">
                             <span>Age: {appt.patient?.age}</span>
+                            {/* Online Consultation badge */}
+                            {appt.appointment_type?.includes('video') && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-100 text-teal-700 text-xs font-medium">
+                                <Video size={11} /> Online Consultation
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-gray-800 text-lg">
-                          {new Date(appt.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+
+                      {/* Right: date + time + status + join button */}
+                      <div className="text-right ml-4 shrink-0 flex flex-col items-end gap-1">
+                        <div className="font-semibold text-gray-800 text-base">
+                          {new Date(appt.time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(appt.time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${appt.status === 'Scheduled' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                           {appt.status}
                         </span>
+                        {/* Join Meeting button — only if a link exists */}
+                        {appt.meeting_link && (
+                          <a
+                            href={appt.meeting_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="mt-1 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-semibold transition-colors shadow-sm"
+                          >
+                            <Video size={13} /> Join Meeting
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}

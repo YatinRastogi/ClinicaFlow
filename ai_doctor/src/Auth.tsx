@@ -13,6 +13,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
+    email: '',
     name: '',
     age: '',
     gender: '',
@@ -36,6 +37,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       : {
           username: formData.username,
           password: formData.password,
+          email: formData.email,
           name: formData.name,
           age: parseInt(formData.age) || 0,
           gender: formData.gender,
@@ -131,6 +133,20 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
           {!isLogin && (
             <>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    placeholder="jane@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>

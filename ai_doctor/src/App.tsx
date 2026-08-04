@@ -284,9 +284,14 @@ const PatientInputForm = ({
 const BookAppointment = ({ patientId }: { patientId: number }) => {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [selectedTime, setSelectedTime] = useState('');
+  const [appointmentType, setAppointmentType] = useState('15min_video');
   const [status, setStatus] = useState<{type: 'idle' | 'loading' | 'success' | 'error', msg: string}>({type: 'idle', msg: ''});
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  // All possible slots for any given day (24-hour format)
+  const ALL_SLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
 
   React.useEffect(() => {
     fetch('http://127.0.0.1:8000/api/doctors')
@@ -296,48 +301,81 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
   }, []);
 
   React.useEffect(() => {
-    if (!selectedDoctor) {
+    setSelectedTime(''); // reset time when date/doctor changes
+    if (!selectedDoctor || !selectedDate) {
       setBookedSlots([]);
       return;
     }
     fetch(`http://127.0.0.1:8000/api/doctors/${selectedDoctor}/booked-slots`)
       .then(res => res.json())
       .then(data => {
-        const booked = (data.booked_slots || []).map((iso: string) => {
-          const d = new Date(iso);
-          return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-        });
+        // Filter slots that belong to the selectedDate and extract HH:MM (24h)
+        const booked = (data.booked_slots || [])
+          .filter((iso: string) => iso.startsWith(selectedDate))
+          .map((iso: string) => {
+            const d = new Date(iso);
+            return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+          });
         setBookedSlots(booked);
       })
       .catch(() => setBookedSlots([]));
-  }, [selectedDoctor]);
+  }, [selectedDoctor, selectedDate]);
+
+  /**
+   * Returns the slots available for the currently selected date:
+   *  - Removes any slot that is already booked.
+   *  - If the selected date is today, also removes any slot whose time
+   *    has already passed (or is within the next 30 minutes).
+   */
+  const getFilteredSlots = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isToday = selectedDate === todayStr;
+    const nowPlus30 = new Date(Date.now() + 30 * 60 * 1000); // 30 min buffer
+
+    return ALL_SLOTS.filter(slot => {
+      if (bookedSlots.includes(slot)) return false; // already booked
+      if (isToday) {
+        // Build a Date for today at slot time (local)
+        const [h, m] = slot.split(':').map(Number);
+        const slotDate = new Date();
+        slotDate.setHours(h, m, 0, 0);
+        if (slotDate <= nowPlus30) return false; // past or too soon
+      }
+      return true;
+    });
+  };
 
   const handleBook = async () => {
-    if (!selectedDoctor || !selectedTime) return;
+    if (!selectedDoctor || !selectedDate || !selectedTime) return;
     setStatus({type: 'loading', msg: ''});
     try {
-      // Create a date object for today at the selected time (e.g. "14:00")
-      const today = new Date();
+      const dateObj = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(':');
-      today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-      const isoString = today.toISOString();
+      dateObj.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      const isoString = dateObj.toISOString();
 
       const res = await fetch('http://127.0.0.1:8000/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doctor_id: parseInt(selectedDoctor), patient_id: patientId, appointment_time: isoString })
+        body: JSON.stringify({ 
+          doctor_id: parseInt(selectedDoctor), 
+          patient_id: patientId, 
+          appointment_time: isoString,
+          appointment_type: appointmentType
+        })
       });
       
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Booking failed');
       
-      setStatus({type: 'success', msg: 'Appointment booked successfully!'});
+      setStatus({type: 'success', msg: '✅ Appointment booked! Check your email for the Google Meet link.'});
+      setSelectedTime('');
     } catch (e: any) {
       setStatus({type: 'error', msg: e.message});
     }
   };
 
-  const availableSlots = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
+  const filteredSlots = getFilteredSlots();
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-indigo-100">
@@ -351,18 +389,47 @@ const BookAppointment = ({ patientId }: { patientId: number }) => {
           </select>
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">Select Time (Today)</label>
-          <select className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" value={selectedTime} onChange={e => setSelectedTime(e.target.value)}>
-            <option value="">-- Choose Time --</option>
-            {availableSlots.map(t => {
-              const isBooked = bookedSlots.includes(t);
-              return <option key={t} value={t} disabled={isBooked}>{t} {isBooked ? '(Booked)' : ''}</option>;
-            })}
+          <label className="block text-sm text-gray-600 mb-1">Appointment Type</label>
+          <select className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" value={appointmentType} onChange={e => setAppointmentType(e.target.value)}>
+            <option value="15min_video">Video Consultation (15 min)</option>
+            <option value="10min_basic">Basic Asking (5-10 min)</option>
           </select>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Select Date</label>
+            <input 
+              type="date" 
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" 
+              value={selectedDate} 
+              onChange={e => setSelectedDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              max={new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Select Time</label>
+            {filteredSlots.length === 0 ? (
+              <div className="w-full p-2 border rounded bg-red-50 text-red-600 text-sm flex items-center gap-1">
+                ⚠️ No slots available for this date
+              </div>
+            ) : (
+              <select
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500"
+                value={selectedTime}
+                onChange={e => setSelectedTime(e.target.value)}
+              >
+                <option value="">-- Choose Time --</option>
+                {filteredSlots.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
         <button 
           onClick={handleBook}
-          disabled={!selectedDoctor || !selectedTime || status.type === 'loading'}
+          disabled={!selectedDoctor || !selectedDate || !selectedTime || status.type === 'loading' || filteredSlots.length === 0}
           className="w-full py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition-colors"
         >
           {status.type === 'loading' ? 'Booking...' : 'Confirm Appointment'}

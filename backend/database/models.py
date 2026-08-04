@@ -15,6 +15,8 @@ class PatientProfile(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String) 
+    email = Column(String)
+
     
     # Permanent Medical Profile
     name = Column(String)
@@ -48,6 +50,8 @@ class Appointment(Base):
     patient_id = Column(Integer, ForeignKey("patients.id"))
     appointment_time = Column(DateTime, default=datetime.datetime.utcnow)
     status = Column(String, default="Scheduled") # 'Scheduled', 'Completed'
+    appointment_type = Column(String) # 'video_15', 'basic_10'
+    meeting_link = Column(String)
     
     doctor = relationship("DoctorProfile", back_populates="appointments")
     patient = relationship("PatientProfile", back_populates="appointments")

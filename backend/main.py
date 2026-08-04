@@ -18,7 +18,7 @@ import shutil
 import uuid
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, staticfiles, Depends
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, staticfiles, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -28,6 +28,8 @@ from database.models import SessionLocal, PatientProfile, DoctorProfile, Appoint
 
 from langgraph_logic import graph_with_checkpoint
 from utils.interview_memory import make_interview_state
+from utils.email_sender import send_appointment_email
+from services.calendar_service import create_google_meet
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -96,6 +98,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 class PatientCreate(BaseModel):
     username: str
     password: str
+    email: str
     name: str
     age: int
     gender: str
@@ -117,6 +120,7 @@ def register_patient(patient: PatientCreate, db: Session = Depends(get_db)):
     new_patient = PatientProfile(
         username=patient.username,
         hashed_password=get_password_hash(patient.password), 
+        email=patient.email,
         name=patient.name,
         age=patient.age,
         gender=patient.gender,
@@ -350,6 +354,7 @@ class AppointmentCreate(BaseModel):
     doctor_id: int
     patient_id: int
     appointment_time: str
+    appointment_type: str
 
 class RagQaRequest(BaseModel):
     patient_id: int
@@ -374,34 +379,90 @@ def get_patient_reports(patient_id: int, db: Session = Depends(get_db)):
     return {"reports": [{"id": r.id, "url": r.report_url, "created_at": r.created_at.isoformat(), "data": json.loads(r.report_data)} for r in reports]}
 
 @app.post("/api/appointments")
-def book_appointment(appt: AppointmentCreate, db: Session = Depends(get_db)):
+def book_appointment(appt: AppointmentCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """Books a new appointment for a patient with a specific doctor, verifying availability."""
+    import datetime as dt
+
     doctor = db.query(DoctorProfile).filter(DoctorProfile.id == appt.doctor_id).first()
     patient = db.query(PatientProfile).filter(PatientProfile.id == appt.patient_id).first()
-    
+
     if not doctor or not patient:
         raise HTTPException(status_code=404, detail="Doctor or Patient not found")
-        
+
     try:
-        import datetime
-        appt_time = datetime.datetime.fromisoformat(appt.appointment_time.replace('Z', '+00:00'))
-    except:
+        appt_time = dt.datetime.fromisoformat(appt.appointment_time.replace('Z', '+00:00'))
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid appointment_time format")
-        
+
     # Check availability
     existing = db.query(Appointment).filter(
-        Appointment.doctor_id == doctor.id, 
+        Appointment.doctor_id == doctor.id,
         Appointment.appointment_time == appt_time
     ).first()
-    
+
     if existing:
         raise HTTPException(status_code=400, detail="Doctor is already booked for this time slot.")
-        
-    new_appt = Appointment(doctor_id=doctor.id, patient_id=patient.id, appointment_time=appt_time)
+
+    # -----------------------------------------------------------------------
+    # Create a real Google Meet via the Calendar API.
+    # Duration: 15 min for video, 10 min for basic.
+    # Falls back to a UUID link if the Calendar API is unavailable.
+    # -----------------------------------------------------------------------
+    duration_minutes = 15 if "video" in appt.appointment_type else 10
+    end_time = appt_time + dt.timedelta(minutes=duration_minutes)
+
+    # Collect attendee emails (doctor email not stored in DB, so only patient)
+    attendees = []
+    if patient.email:
+        attendees.append(patient.email)
+
+    meeting_link = f"https://meet.jit.si/clinicaflow-{uuid.uuid4()}"  # safe fallback
+    google_event_id = None
+    try:
+        result = create_google_meet(
+            summary=f"ClinicaFlow: {patient.name} with Dr. {doctor.name}",
+            description=(
+                f"Online consultation booked via ClinicaFlow.\n"
+                f"Patient: {patient.name}\n"
+                f"Doctor: Dr. {doctor.name} ({doctor.specialty})\n"
+                f"Type: {appt.appointment_type}"
+            ),
+            start_time=appt_time,
+            end_time=end_time,
+            attendees=attendees,
+        )
+        meeting_link = result["meet_link"]
+        google_event_id = result["event_id"]
+        print(f"✅ Google Meet created: {meeting_link} (event_id={google_event_id})")
+    except Exception as e:
+        # Non-fatal — appointment is still booked, fallback link is used
+        print(f"⚠️  Google Meet creation failed, using fallback link. Reason: {e}")
+
+    new_appt = Appointment(
+        doctor_id=doctor.id,
+        patient_id=patient.id,
+        appointment_time=appt_time,
+        appointment_type=appt.appointment_type,
+        meeting_link=meeting_link,
+    )
     db.add(new_appt)
     db.commit()
     db.refresh(new_appt)
-    return {"message": "Appointment booked", "appointment_id": new_appt.id}
+
+    # Send confirmation email in the background (Google Calendar also emails
+    # attendees, but our email provides a richer ClinicaFlow-branded template)
+    if patient.email:
+        background_tasks.add_task(
+            send_appointment_email,
+            to_email=patient.email,
+            patient_name=patient.name,
+            doctor_name=doctor.name,
+            time=appt_time.strftime("%d %b %Y, %I:%M %p"),
+            meet_link=meeting_link,
+            duration=appt.appointment_type,
+        )
+
+    return {"message": "Appointment booked", "appointment_id": new_appt.id, "meeting_link": meeting_link}
 
 @app.put("/api/appointments/{appointment_id}/complete")
 def complete_appointment(appointment_id: int, db: Session = Depends(get_db)):
@@ -435,6 +496,8 @@ def get_doctor_schedule(doctor_id: int, db: Session = Depends(get_db)):
             "appointment_id": a.id,
             "time": a.appointment_time.isoformat() + "Z",
             "status": a.status,
+            "appointment_type": a.appointment_type,
+            "meeting_link": a.meeting_link,
             "patient": {
                 "id": patient.id,
                 "name": patient.name,
