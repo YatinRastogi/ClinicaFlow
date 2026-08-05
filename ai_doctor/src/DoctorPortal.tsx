@@ -109,6 +109,19 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
                           {appt.patient?.name?.charAt(0) || '?'}
                         </div>
                         <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            {((appt.meeting && appt.meeting.link) || appt.meeting_link) && (
+                              <a
+                                href={appt.meeting?.link || appt.meeting_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold hover:bg-indigo-200 transition-colors"
+                              >
+                                <Video size={12} /> {appt.meeting?.label || 'Online consultancy'}
+                              </a>
+                            )}
+                          </div>
                           <h3 className="font-semibold text-gray-900 truncate">{appt.patient?.name || 'Unknown'}</h3>
                           <div className="text-sm text-gray-500 flex flex-wrap gap-3 mt-1">
                             <span>Age: {appt.patient?.age}</span>
@@ -124,6 +137,9 @@ export const DoctorPortal = ({ onLogout, doctorProfile }: { onLogout: () => void
 
                       {/* Right: date + time + status + join button */}
                       <div className="text-right ml-4 shrink-0 flex flex-col items-end gap-1">
+                        <div className="text-xs uppercase tracking-wide text-indigo-600 font-semibold">
+                          {appt.day || new Date(appt.time).toLocaleDateString('en-IN', { weekday: 'long' })}
+                        </div>
                         <div className="font-semibold text-gray-800 text-base">
                           {new Date(appt.time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </div>

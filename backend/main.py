@@ -1,16 +1,3 @@
-# backend/main.py
-"""
-FastAPI backend for the AI Diagnostic Assistant.
-
-Changes from original
-~~~~~~~~~~~~~~~~~~~~~
-- Continuation flow now calls extract_memory_node BEFORE resuming the graph,
-  by updating state with both the new human message AND the updated interview_state.
-- The interview_state is persisted inside LangGraph's MemorySaver automatically;
-  no extra storage is needed.
-- The hardcoded localhost URL is replaced by a configurable BASE_URL env variable.
-"""
-
 import asyncio
 import json
 import os
@@ -495,9 +482,14 @@ def get_doctor_schedule(doctor_id: int, db: Session = Depends(get_db)):
         schedule.append({
             "appointment_id": a.id,
             "time": a.appointment_time.isoformat() + "Z",
+            "day": a.appointment_time.strftime("%A"),
             "status": a.status,
             "appointment_type": a.appointment_type,
             "meeting_link": a.meeting_link,
+            "meeting": {
+                "link": a.meeting_link,
+                "label": "Online consultancy"
+            },
             "patient": {
                 "id": patient.id,
                 "name": patient.name,
