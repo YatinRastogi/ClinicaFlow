@@ -32,6 +32,13 @@ triage_llm = ChatGroq(
     max_retries=5
 )
 
+small_llm = ChatGroq(
+    api_key=GROQ_API_KEY,
+    model="meta-llama/llama-4-scout-17b-16e-instruct", # Fast and good for structured tasks
+    temperature=0.2,
+    max_retries=5
+)
+
 # They can use the main 'llm' configuration, but are defined separately for future modularity
 general_medicine_llm = llm
 cardiology_llm = llm
