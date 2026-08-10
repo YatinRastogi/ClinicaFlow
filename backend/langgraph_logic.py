@@ -42,6 +42,7 @@ from utils.llm import (
     lab_report_llm,
     llm,
     triage_llm,
+    small_llm
 )
 from utils.pdf_generator import create_pdf_report
 from utils.prompts import (
@@ -158,10 +159,11 @@ def _clean_and_parse(raw: str) -> Dict[str, Any]:
     return json.loads(raw)
 
 
-def _conversation_history_text(messages: List[Dict[str, Any]]) -> str:
+def _conversation_history_text(messages: List[Dict[str, Any]], max_messages: int = 0) -> str:
     """Formats the conversation messages into a plain text transcript."""
+    msgs_to_process = messages[-max_messages:] if max_messages > 0 else messages
     return "\n".join(
-        f"{msg['role'].upper()}: {msg['content']}" for msg in messages
+        f"{msg['role'].upper()}: {msg['content']}" for msg in msgs_to_process
     )
 
 
@@ -180,7 +182,7 @@ def preprocess_node(state: PatientState) -> Dict[str, Any]:
 
     vitals = raw.get("vitals") or {}
     patient_profile_text = format_patient_profile(state.get("patient_profile"))
-    chain = intake_prompt | llm
+    chain = intake_prompt | small_llm
     llm_response = chain.invoke({
         "patient_profile": patient_profile_text,
         "patient_data": json.dumps(raw),
@@ -268,7 +270,7 @@ def refine_questions_node(state: PatientState) -> Dict[str, Any]:
         return {}
 
     memory_context = build_memory_context_block(interview_state)
-    chain = question_refinement_prompt | llm
+    chain = question_refinement_prompt | small_llm
     llm_response = chain.invoke({
         "initial_questions": json.dumps(initial_questions),
         "lab_summary": json.dumps(lab_summary),
@@ -315,7 +317,7 @@ def extract_memory_node(state: PatientState) -> Dict[str, Any]:
     extracted = extract_memory_from_reply(
         question=last_ai_question,
         reply=last_human,
-        llm=llm,
+        llm=small_llm,
     )
     interview_state = apply_extraction_to_state(extracted, interview_state)
     interview_state = update_confidence(interview_state)
@@ -352,10 +354,10 @@ def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
         return {"pending_question": None, "interview_state": interview_state}
 
     memory_context = build_memory_context_block(interview_state)
-    conversation_history = _conversation_history_text(messages)
+    conversation_history = _conversation_history_text(messages, max_messages=4)
     patient_profile_text = format_patient_profile(state.get("patient_profile"))
 
-    chain = next_question_prompt | llm
+    chain = next_question_prompt | small_llm
     llm_response = chain.invoke({
         "patient_profile": patient_profile_text,
         "memory_context": memory_context,
