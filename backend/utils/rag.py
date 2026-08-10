@@ -21,8 +21,8 @@ def get_retriever_for_specialty(specialty: str):
         persist_directory=DB_DIR
     )
 
-    # UPDATED: Fetch the top 5 most relevant chunks
-    return vectorstore.as_retriever(search_kwargs={"k": 5})
+    # UPDATED: Fetch the top 3 most relevant chunks
+    return vectorstore.as_retriever(search_kwargs={"k": 3})
 
 
 def retrieve_medical_context(symptoms: str, specialty: str) -> str:
