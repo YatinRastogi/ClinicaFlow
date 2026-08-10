@@ -252,27 +252,23 @@ def update_confidence(
 ) -> Dict[str, Any]:
     """
     Heuristically update confidence_score and conversation_stage.
-
-    This is intentionally simple — the LLM drives the actual stopping
-    decision; this score is advisory context fed into the next prompt.
-
-    Scoring heuristic
-    -----------------
-    +0.15 per known fact (capped at 0.75 from facts alone)
-    +0.20 if specialist explicitly said "complete"
-    Capped at 1.0
     """
+    # 1. Reduced the weight per fact (from 0.15 to 0.10)
+    # 2. Lowered the absolute cap for facts (from 0.75 to 0.60)
     n_facts = len(interview_state.get("known_facts", {}))
-    score = min(n_facts * 0.15, 0.75)
+    score = min(n_facts * 0.10, 0.60)
 
     if specialist_status == "complete":
-        score = min(score + 0.20, 1.0)
+        # Increased the bonus so the score still hits 1.0 when the specialist explicitly concludes
+        score = min(score + 0.40, 1.0)
 
     interview_state["confidence_score"] = round(score, 2)
 
-    # Stage transitions
     turn = interview_state.get("turn_count", 0)
-    if score >= 0.70 or specialist_status == "complete":
+    MIN_TURNS = 5  # The AI is now strictly forced to ask at least 5 questions
+
+    # 3. Stage transitions now require the MIN_TURNS threshold to be met
+    if specialist_status == "complete" or (score >= 0.60 and turn >= MIN_TURNS):
         interview_state["conversation_stage"] = "finalizing"
     elif turn >= 4 or score >= 0.40:
         interview_state["conversation_stage"] = "refining"

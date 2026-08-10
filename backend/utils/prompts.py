@@ -15,6 +15,7 @@ Changes from original
 """
 
 from langchain_core.prompts import ChatPromptTemplate
+from utils.interview_memory import MAX_TURNS 
 
 # ---------------------------------------------------------------------------
 # Intake Prompt (unchanged)
@@ -155,9 +156,11 @@ Decide whether to ask ONE more clarifying question or to end the interview.
 5.  If the patient has past prescriptions listed in their profile, and you haven't yet, you MUST ask at least one follow-up question regarding their current usage of that medication or potential side effects.
 
 6.  If you have enough information to form a reasonable preliminary  
-    assessment (even if imperfect), set status to "sufficient".
+    assessment, set status to "sufficient". However, unless the diagnosis is 
+    immediately obvious, aim to ask at least 3 to 5 follow-up questions 
+    to ensure patient safety and build a comprehensive clinical picture.
 
-7.  If the turn count is 8 or more, you MUST set status to "sufficient"  
+7.  If the turn count reaches {MAX_TURNS}, you MUST set status to "sufficient"  
     regardless of completeness — do not loop indefinitely.
 
 **Output Format — ONLY a single JSON object:**
@@ -271,9 +274,9 @@ def _build_specialist_system_text(role: str, max_turns: int, memory_context: str
         "  (c) note in \"information_gaps\" that results are pending and confidence will\n"
         "      improve once those tests are done.\n"
         "This is the MOST COMMON scenario — always be ready to conclude without lab data.\n\n"
-        "- If the conversation_stage is \"finalizing\" OR the confidence_score is >= 0.65,\n"
-        "  you MUST produce a complete analysis (status: \"complete\") even if some\n"
-        "  information is missing — use your clinical reasoning to fill gaps.\n"
+        "- If the conversation_stage is \"finalizing\", you MUST produce a complete,\n"
+        "  analysis (status: \"complete\") even if some information is missing — use\n"
+        "  your clinical reasoning to fill gaps.\n"
         "- If critical information is still missing AND the stage is \"gathering\" or\n"
         "  \"refining\", you may request clarification (status: \"incomplete\"), but ONLY\n"
         "  for items NOT listed in \"Unavailable Information\" and NOT already asked.\n"
