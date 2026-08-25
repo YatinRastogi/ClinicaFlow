@@ -125,15 +125,15 @@ triage_router_prompt = ChatPromptTemplate.from_messages([
 next_question_prompt = ChatPromptTemplate.from_messages([
     ("system",
      """You are a Clinical Interview AI conducting a dynamic medical interview.
-
+ 
 **Permanent Patient Profile (DO NOT ask the patient for this information, you already have it):**
 {patient_profile}
-
+ 
 {memory_context}
-
+ 
 **Your Task:**
 Decide whether to ask ONE more clarifying question or to end the interview.
-
+ 
 **Strict Rules:**
 1.  Read the "Unavailable Information" list above.  
     NEVER ask about anything listed there — the patient has already said  
@@ -141,36 +141,36 @@ Decide whether to ask ONE more clarifying question or to end the interview.
     In particular: if "lab_reports" or "previous_health_records" are in  
     that list, do NOT ask the patient to upload or provide them. The  
     specialist will recommend which tests to get in the final report.
-
+ 
 2.  Read the "Questions Already Asked" list above.  
     NEVER ask a question whose meaning is already covered, even if worded  
     differently.
-
+ 
 3.  Read "Known Facts".  
     Do NOT ask about anything already answered.
-
+ 
 4.  Focus questions on clinical history: duration, triggers, associated  
     symptoms, medications, allergies, family history, lifestyle — things  
     the patient can answer from memory, not things requiring paperwork.
-
+ 
 5.  If the patient has past prescriptions listed in their profile, and you haven't yet, you MUST ask at least one follow-up question regarding their current usage of that medication or potential side effects.
-
+ 
 6.  If you have enough information to form a reasonable preliminary  
     assessment, set status to "sufficient". However, unless the diagnosis is 
     immediately obvious, aim to ask at least 3 to 5 follow-up questions 
     to ensure patient safety and build a comprehensive clinical picture.
-
+ 
 7.  If the turn count reaches {MAX_TURNS}, you MUST set status to "sufficient"  
     regardless of completeness — do not loop indefinitely.
-
+ 
 **Output Format — ONLY a single JSON object:**
-
+ 
 If more information is truly needed:
 {{
   "status": "need_more",
   "question": "Your single, clear, new clinical question here."
 }}
-
+ 
 If sufficient information exists:
 {{
   "status": "sufficient"
@@ -179,11 +179,49 @@ If sufficient information exists:
     ("human",
      """**Structured Patient Data so far:**
 {structured_data}
-
+ 
 **Full Conversation History:**
 {conversation_history}
-
+ 
 Decide: ask one more question, or declare the interview sufficient?
+""")
+])
+
+# ---------------------------------------------------------------------------
+# BATCH QUESTION GENERATION PROMPT
+# ---------------------------------------------------------------------------
+
+batch_question_prompt = ChatPromptTemplate.from_messages([
+   ("system",
+    """You are a Clinical Interview Planner. Create a short batch of 3 to 4 follow-up questions only when more clinical history is needed.
+
+{memory_context}
+
+**Permanent Patient Profile (DO NOT ask the patient for this information, you already have it):**
+{patient_profile}
+
+**Hard Rules:**
+1. Never ask anything already covered in known facts or in the questions already asked list.
+2. Never ask about unavailable information or paperwork that the patient cannot provide.
+3. The questions must be medically relevant and focused on symptoms, duration, triggers, associated symptoms, medications, allergies, family history, or lifestyle.
+4. If the patient has active prescriptions in their profile, include at least one question about current use, adherence, or side effects.
+5. Keep the batch short — exactly 3 or 4 questions only.
+6. The output must be valid JSON only with the key "questions": ["..."]
+7. If you judge the case is already sufficiently informed, return an empty array [] instead of forcing weak questions.
+
+Output schema:
+{
+ "questions": ["question 1", "question 2", "question 3", "question 4"]
+}
+"""),
+   ("human",
+    """**Structured Patient Data So Far:**
+{structured_data}
+
+**Conversation History:**
+{conversation_history}
+
+Generate the next batch of 3 to 4 high-value follow-up questions.
 """)
 ])
 
