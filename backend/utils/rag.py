@@ -2,9 +2,14 @@
 import os
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 # 1. Initialize the exact same free embedding model we used to build the DB
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = HuggingFaceEmbeddings(
+        model_name=EMBEDDING_MODEL
+)
+
 DB_DIR = "./chroma_db"
 
 def get_retriever_for_specialty(specialty: str):
@@ -22,7 +27,7 @@ def get_retriever_for_specialty(specialty: str):
     )
 
     # UPDATED: Fetch the top 3 most relevant chunks
-    return vectorstore.as_retriever(search_kwargs={"k": 3})
+    return vectorstore.as_retriever(search_kwargs={"k": 5})
 
 
 def retrieve_medical_context(symptoms: str, specialty: str) -> str:

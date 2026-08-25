@@ -21,9 +21,8 @@ from sentence_transformers import SentenceTransformer
 # ---------------------------------------------------------------------------
 # Embedding model (loaded once at module import)
 # ---------------------------------------------------------------------------
-# "all-MiniLM-L6-v2" is 80 MB, fast, and good enough for clinical dedup.
-# Swap for a larger model if you need higher accuracy.
-_EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+# _EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+_EMBED_MODEL = SentenceTransformer("BAAI/bge-small-en-v1.5")
 
 # Cosine similarity threshold above which two questions are "the same"
 DEDUP_THRESHOLD: float = 0.70
