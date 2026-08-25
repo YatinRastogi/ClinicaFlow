@@ -3,12 +3,13 @@
 AI Diagnostic Assistant — LangGraph State Machine
 --------------------------------------------------
 - PatientState gains an `interview_state` field (the persistent memory object)
-- `initialize_chat_node` is removed; question generation is now fully dynamic
-  via `ask_one_question_node` which calls the LLM on every turn.
-- A new `extract_memory_node` runs after each human reply to update known_facts,
-  unavailable_information, embeddings, and confidence score.
-- `ask_one_question_node` uses the `next_question_prompt` to generate ONE
-  question per turn, checks for semantic duplicates, and respects MAX_TURNS.
+- Question generation is batched: the system queues 3-4 clinically relevant
+  follow-ups in one LLM call and asks them sequentially, instead of invoking
+  the LLM after every individual patient reply.
+- The patient reply is stored directly in the transcript; no per-reply memory
+  extraction LLM pass is used for routine interview tracking.
+- `ask_one_question_node` pulls from a queue, checks semantic duplicates, and
+  respects MAX_TURNS.
 - All specialist nodes inject `memory_context` into their prompts.
 - `decide_if_chat_needed` and `decide_to_continue_chat` are updated accordingly.
 """
@@ -25,10 +26,7 @@ from langgraph.graph import END, StateGraph
 from utils.rag import retrieve_medical_context
 from utils.interview_memory import (
     MAX_TURNS,
-    apply_extraction_to_state,
     build_memory_context_block,
-    embed_text,
-    extract_memory_from_reply,
     is_duplicate_question,
     make_interview_state,
     register_question,
@@ -46,6 +44,7 @@ from utils.llm import (
 )
 from utils.pdf_generator import create_pdf_report
 from utils.prompts import (
+    batch_question_prompt,
     cardiology_prompt,
     dermatology_prompt,
     general_medicine_prompt,
@@ -69,7 +68,7 @@ class PatientState(TypedDict, total=False):
     structured_input: Dict[str, Any]
     messages: List[Dict[str, Any]]
     interview_state: Dict[str, Any]
-    pending_question: Optional[str]      
+    pending_question: Optional[str]
     diagnosis_path: str
     final_analysis: Dict[str, Any]
     report_path: str
@@ -289,109 +288,104 @@ def refine_questions_node(state: PatientState) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Node 4: Extract Memory from the latest human reply
+# Batch question generation and patient-reply pause
 # ---------------------------------------------------------------------------
 
-def extract_memory_node(state: PatientState) -> Dict[str, Any]:
-    """
-    Run after each human reply.  Extracts facts / unavailable items and
-    updates interview_state.  Also deduplicates against existing knowledge.
-    """
-    print("--- 🧠 EXTRACTING MEMORY FROM REPLY ---")
-    messages = state.get("messages", [])
-    interview_state = state.get("interview_state", make_interview_state()).copy()
-
-    # Find the most recent human message and the AI question that preceded it
-    last_human = next(
-        (m["content"] for m in reversed(messages) if m["role"] == "human"),
-        "",
-    )
-    last_ai_question = next(
-        (m["content"] for m in reversed(messages) if m["role"] == "ai"),
-        "",
-    )
-
-    if not last_human:
-        return {}
-
-    extracted = extract_memory_from_reply(
-        question=last_ai_question,
-        reply=last_human,
-        llm=small_llm,
-    )
-    interview_state = apply_extraction_to_state(extracted, interview_state)
-    interview_state = update_confidence(interview_state)
-
-    print(
-        f"--- Memory updated. Facts: {len(interview_state['known_facts'])}, "
-        f"Unavailable: {len(interview_state['unavailable_information'])}, "
-        f"Confidence: {interview_state['confidence_score']:.0%} ---"
-    )
-    return {"interview_state": interview_state}
-
-
-# ---------------------------------------------------------------------------
-# Node 5: Ask One Question  (LLM-driven, dedup-aware)
-# ---------------------------------------------------------------------------
-
-def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
-    """
-    Ask the next question by calling the LLM with the next_question_prompt.
-
-    - Injects full memory context so the LLM knows what's been asked / unavailable.
-    - Checks the LLM's own "status" field to see if it wants to continue.
-    - Falls back to semantic dedup to catch cases where the LLM still repeats.
-    - Clears pending_question and returns None if interview should end.
-    """
-    print("--- ❓ GENERATING NEXT QUESTION ---")
+def generate_question_batch(state: PatientState, interview_state: Dict[str, Any]) -> List[str]:
+    """Generate a short queue of relevant follow-up questions in one LLM call."""
     messages = state.get("messages", [])
     structured_input = state.get("structured_input", {})
-    interview_state = state.get("interview_state", make_interview_state()).copy()
 
-    # Hard safety net
     if should_force_terminate(interview_state):
-        print("--- MAX_TURNS reached. Forcing termination. ---")
-        return {"pending_question": None, "interview_state": interview_state}
+        return []
 
     memory_context = build_memory_context_block(interview_state)
-    conversation_history = _conversation_history_text(messages, max_messages=4)
+    conversation_history = _conversation_history_text(messages, max_messages=8)
     patient_profile_text = format_patient_profile(state.get("patient_profile"))
 
-    chain = next_question_prompt | small_llm
+    chain = batch_question_prompt | small_llm
     llm_response = chain.invoke({
         "patient_profile": patient_profile_text,
         "memory_context": memory_context,
         "structured_data": json.dumps(structured_input, indent=2),
         "conversation_history": conversation_history,
-        "MAX_TURNS": MAX_TURNS,
     })
 
     try:
         response_json = _clean_and_parse(llm_response.content)
     except Exception as e:
-        print(f"--- ERROR parsing next_question response: {e}. Ending interview. ---")
+        print(f"--- ERROR parsing batch question response: {e}. ---")
+        return []
+
+    questions = response_json.get("questions", [])
+    if not isinstance(questions, list):
+        return []
+
+    valid_questions: List[str] = []
+    seen = set()
+    for question in questions:
+        candidate = str(question).strip()
+        if not candidate:
+            continue
+        normalized = candidate.lower()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        is_dup, _ = is_duplicate_question(candidate, interview_state)
+        if is_dup:
+            continue
+        valid_questions.append(candidate)
+
+    return valid_questions[:4]
+
+
+def await_patient_reply_node(state: PatientState) -> Dict[str, Any]:
+    """No-op node used as the checkpoint boundary before the next queued question."""
+    return {}
+
+
+# ---------------------------------------------------------------------------
+# Node 5: Ask One Queued Question (batched, dedup-aware)
+# ---------------------------------------------------------------------------
+
+def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
+    """
+    Pull the next question from the pre-generated queue. If the queue is empty,
+    generate a new 3-4 question batch in a single LLM call.
+    """
+    print("--- ❓ GENERATING / PULLING NEXT QUESTION ---")
+    messages = state.get("messages", [])
+    interview_state = state.get("interview_state", make_interview_state()).copy()
+
+    if should_force_terminate(interview_state):
+        print("--- MAX_TURNS reached. Forcing termination. ---")
         return {"pending_question": None, "interview_state": interview_state}
 
-    if response_json.get("status") == "sufficient":
-        print("--- LLM declared interview sufficient. ---")
+    pending_questions = list(interview_state.get("pending_questions", []))
+    if not pending_questions:
+        pending_questions = generate_question_batch(state, interview_state)
+        interview_state["pending_questions"] = pending_questions
+
+    if not pending_questions:
+        print("--- No queued questions available. Ending interview. ---")
         return {"pending_question": None, "interview_state": interview_state}
 
-    question = response_json.get("question", "").strip()
-    if not question:
-        print("--- No question returned. Ending interview. ---")
-        return {"pending_question": None, "interview_state": interview_state}
+    question = pending_questions[0]
+    remaining_questions = pending_questions[1:]
+    interview_state["pending_questions"] = remaining_questions
 
-    # Semantic dedup guard (in case the LLM ignored the memory context)
+    # If the LLM somehow generated a duplicate, skip it and keep moving through the queue.
     is_dup, sim = is_duplicate_question(question, interview_state)
     if is_dup:
-        print(f"--- Duplicate question suppressed (similarity={sim:.2f}). Ending interview. ---")
-        return {"pending_question": None, "interview_state": interview_state}
+        print(f"--- Duplicate question suppressed (similarity={sim:.2f}). Trying next queued item. ---")
+        if remaining_questions:
+            interview_state["pending_questions"] = remaining_questions[1:]
+            question = remaining_questions[0]
+        else:
+            return {"pending_question": None, "interview_state": interview_state}
 
-    # Register the question in memory
     interview_state = register_question(question, interview_state)
-
-    # Append to message history
-    messages = list(messages)  # copy to avoid mutating shared state
+    messages = list(messages)
     messages.append({"role": "ai", "content": question})
 
     print(f"--- ❓ ASKING: {question} ---")
@@ -619,7 +613,7 @@ builder = StateGraph(PatientState)
 builder.add_node("preprocess",                  preprocess_node)
 builder.add_node("process_lab_reports",         process_all_lab_reports_node)
 builder.add_node("refine_questions",            refine_questions_node)
-builder.add_node("extract_memory",              extract_memory_node)
+builder.add_node("await_patient_reply",         await_patient_reply_node)
 builder.add_node("ask_one_question",            ask_one_question_node)
 builder.add_node("triage_router",               triage_router_node)
 builder.add_node("retrieve_context",            retrieve_context_node)
@@ -642,19 +636,17 @@ builder.add_conditional_edges(
     {"start_chat": "ask_one_question", "no_chat_needed": "triage_router"},
 )
 
-# After human reply comes in: extract_memory → ask_one_question
-# (The graph resumes here on continuation calls from the API)
-builder.add_edge("extract_memory", "ask_one_question")
+# After human reply comes in: resume from the checkpoint and continue to ask
+# the next queued question without a separate memory-extraction LLM pass.
+builder.add_edge("await_patient_reply", "ask_one_question")
 
 # After ask_one_question:
-# - 'continue_chat' → extract_memory (graph will be interrupted BEFORE the
-#   next ask_one_question call via interrupt_before, giving the API a chance
-#   to inject the human reply first)
-# - 'end_chat'      → triage_router (interview finished, no interrupt)
+# - 'continue_chat' → await_patient_reply (pause point before the next queued question)
+# - 'end_chat'      → triage_router (interview finished)
 builder.add_conditional_edges(
     "ask_one_question",
     decide_to_continue_chat,
-    {"continue_chat": "extract_memory", "end_chat": "triage_router"},
+    {"continue_chat": "await_patient_reply", "end_chat": "triage_router"},
 )
 # Triage always goes to RAG first
 builder.add_edge("triage_router", "retrieve_context")
@@ -692,16 +684,9 @@ checkpointer = MemorySaver()
 
 graph_with_checkpoint = builder.compile(
     checkpointer=checkpointer,
-    # interrupt_before: graph pauses BEFORE running extract_memory.
-    # This means:
-    # 1. The previous ask_one_question already ran and set pending_question.
-    # 2. The API returns pending_question to the frontend.
-    # 3. When the human replies, main.py injects the answer and resumes.
-    # 4. The graph runs extract_memory → ask_one_question with fresh state.
-    # Crucially: if ask_one_question returns pending_question=None and routes
-    # to triage, there is NO interrupt — the graph runs straight through to
-    # generate_report and sets is_complete=True correctly.
-    interrupt_before=["extract_memory"],
+    # Pause after each question is sent so the API can inject the next human answer
+    # before the next queued question is asked.
+    interrupt_before=["await_patient_reply"],
 )
 
 # Non-interrupting version for testing

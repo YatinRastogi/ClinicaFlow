@@ -252,14 +252,17 @@ async def chat(
             messages.append({"role": "human", "content": human_answer})
             current_values["messages"] = messages
 
+            interview_state = dict(current_values.get("interview_state") or make_interview_state())
+            interview_state["turn_count"] = int(interview_state.get("turn_count", 0)) + 1
+            current_values["interview_state"] = interview_state
+
             await asyncio.to_thread(
                 graph_with_checkpoint.update_state,
                 config,
                 current_values,
-                as_node="extract_memory",
             )
 
-            graph_input = None  # Resume from checkpoint
+            graph_input = None  # Resume from the checkpoint boundary
 
         # ------------------------------------------------------------------
         # Run / resume the graph

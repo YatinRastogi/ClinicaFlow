@@ -6,8 +6,8 @@
 
 ## 🚀 Key Features
 
-* **Interactive Medical Interview (State Machine):** Uses an intelligent state graph (LangGraph) to ask targeted follow-up questions one at a time, just like a real physician.
-* **Persistent Context Memory:** Dynamically extracts and remembers "known facts" and "unavailable information" during the chat, preventing duplicate questions and ensuring the AI never loses track of the patient's history.
+* **Interactive Medical Interview (State Machine):** Uses an intelligent queue-based interview flow to generate a short set of 3-4 relevant follow-up questions, then asks them one by one without re-triggering the LLM after every reply.
+* **Persistent Context Memory:** Keeps the raw conversation transcript and structured interview state, avoiding a separate per-reply extraction LLM call while preserving duplicate checks and known clinical facts.
 * **Automated Triage & Specialist Routing:** Analyzes the patient's initial complaints and routes the case to a specialized AI persona (e.g., Cardiology, Dermatology, or General Medicine) for highly accurate analysis.
 * **Retrieval-Augmented Generation (RAG):** Grounds the AI's diagnostic reasoning in verified clinical practice guidelines (using ChromaDB) rather than relying solely on the LLM's pre-trained knowledge.
 * **Lab Report Processing:** Parses uploaded PDF lab results and health records to pre-inform the AI before the interview begins.
@@ -23,7 +23,7 @@ ClinicaFlow follows a strict, node-based workflow managed by LangGraph:
 
 1. **Preprocess:** The patient signs in, provides their initial symptoms, and uploads any lab reports via the frontend app.
 2. **Process Labs:** The backend extracts text from lab reports, and an AI summarises the findings.
-3. **Interview Loop (`ask_one_question` & `extract_memory`):** The AI asks a highly targeted question. When the patient replies, the system extracts the medical facts, updates its internal memory state, and loops back to ask the next question until it has sufficient data.
+3. **Interview Loop (`ask_one_question` + queued follow-ups):** The AI generates a compact batch of 3-4 relevant questions up front, asks them one by one, and only asks the LLM for a new batch when the queue is exhausted — reducing unnecessary LLM calls while preserving a structured patient interview.
 4. **Triage Router:** The system decides which medical department is best suited to handle the final diagnosis.
 5. **Context Retrieval (RAG):** The system searches local medical guidelines (e.g., AHA Cardiology Guidelines) for literature matching the patient's symptoms.
 6. **Specialist Analysis:** The specialized AI (e.g., the "Cardiologist") reviews the entire memory state, lab reports, and RAG context to formulate a diagnosis and treatment plan.

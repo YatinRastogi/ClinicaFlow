@@ -53,6 +53,7 @@ def make_interview_state() -> Dict[str, Any]:
         "known_facts": {},
         "unavailable_information": [],
         "questions_asked": [],
+        "pending_questions": [],
         "asked_embeddings": [],   # List[List[float]]
         "confidence_score": 0.0,
         "conversation_stage": "gathering",
