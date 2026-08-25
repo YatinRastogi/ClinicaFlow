@@ -1,66 +1,166 @@
-# build_rag_db.py
 import os
+import shutil
+import uuid
+import torch
+
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
+# =====================================================
 # Configuration
+# =====================================================
+
 DB_DIR = "./chroma_db"
+
 DATA_DIRS = {
     "cardiology": "data/cardiology",
-    "general_medicine": "data/general_medicine"
+    "critical_care": "data/critical_care",
+    "dermatology": "data/dermatology",
+    "endocrinology": "data/endocrinology",
+    "gastroenterology": "data/gastroenterology",
+    "neurology": "data/neurology",
+    "pharmacology": "data/pharmacology",
+    "pulmonology": "data/pulmonology",
 }
 
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+
+CHUNK_SIZE = 1500
+CHUNK_OVERLAP = 300
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+# =====================================================
+# Build Database
+# =====================================================
 
 def build_database():
-    print("--- 🧠 Loading Embedding Model (This may take a moment on first run) ---")
-    # Using a free, fast, high-quality local embedding model
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-    # This breaks the PDFs into readable paragraphs (1000 characters)
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,  # Overlap prevents cutting a sentence in half
-        add_start_index=True
+    print("=" * 70)
+    print("Building ClinicaFlow Knowledge Base")
+    print("=" * 70)
+    print(f"Embedding Model : {EMBEDDING_MODEL}")
+    print(f"Device          : {DEVICE}")
+    print(f"Chunk Size      : {CHUNK_SIZE}")
+    print(f"Chunk Overlap   : {CHUNK_OVERLAP}")
+    print("=" * 70)
+
+    embeddings = HuggingFaceEmbeddings(
+        model_name=EMBEDDING_MODEL,
+        model_kwargs={"device": DEVICE},
+        encode_kwargs={"normalize_embeddings": True},
     )
 
-    for specialty, folder_path in DATA_DIRS.items():
-        print(f"\n--- 📂 Processing Specialty: {specialty.upper()} ---")
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        add_start_index=True,
+    )
 
-        if not os.path.exists(folder_path):
-            print(f"❌ Directory not found: {folder_path}. Please make sure your PDFs are there.")
+    # Remove old database
+    if os.path.exists(DB_DIR):
+        print("\nRemoving previous Chroma database...")
+        shutil.rmtree(DB_DIR)
+
+    total_pages = 0
+    total_chunks = 0
+
+    # =================================================
+
+    for specialty, folder in DATA_DIRS.items():
+
+        print("\n" + "=" * 70)
+        print(f"Processing {specialty.upper()}")
+        print("=" * 70)
+
+        if not os.path.exists(folder):
+            print(f"Folder not found: {folder}")
             continue
 
-        # 1. Load all PDFs from the directory
-        loader = PyPDFDirectoryLoader(folder_path)
-        docs = loader.load()
+        loader = PyPDFDirectoryLoader(folder)
+        documents = loader.load()
 
-        if not docs:
-            print(f"⚠️ No PDFs found in {folder_path}. Skipping...")
+        if len(documents) == 0:
+            print("No PDFs found.")
             continue
 
-        print(f"✅ Loaded {len(docs)} pages from {specialty} PDFs.")
+        print(f"Pages Loaded : {len(documents)}")
 
-        # 2. Split pages into chunks
-        chunks = text_splitter.split_documents(docs)
-        print(f"✅ Split into {len(chunks)} searchable chunks.")
+        chunks = splitter.split_documents(documents)
 
-        # 3. Create or update the Chroma Vector Database Collection
-        print(f"💾 Saving to ChromaDB collection: '{specialty}'...")
+        print(f"Chunks Created : {len(chunks)}")
+
+        # --------------------------------------------
+        # Add Metadata
+        # --------------------------------------------
+
+        for chunk in chunks:
+
+            source = os.path.basename(
+                chunk.metadata.get("source", "")
+            )
+
+            chunk.metadata["specialty"] = specialty
+            chunk.metadata["source_file"] = source
+            chunk.metadata["page"] = chunk.metadata.get("page", -1)
+            chunk.metadata["chunk_id"] = str(uuid.uuid4())
+
+        # --------------------------------------------
+        # Chunk Statistics
+        # --------------------------------------------
+
+        chunk_lengths = [
+            len(chunk.page_content)
+            for chunk in chunks
+        ]
+
+        print(f"Average Chunk Length : {sum(chunk_lengths)//len(chunk_lengths)}")
+        print(f"Smallest Chunk       : {min(chunk_lengths)}")
+        print(f"Largest Chunk        : {max(chunk_lengths)}")
+
+        # --------------------------------------------
+        # Save Collection
+        # --------------------------------------------
+
+        print("Saving to ChromaDB...")
+
         Chroma.from_documents(
             documents=chunks,
-            embedding=embeddings,
+            embedding=embeddings,  
             collection_name=specialty,
-            persist_directory=DB_DIR
+            persist_directory=DB_DIR,
         )
-        print(f"🎉 {specialty.upper()} database built successfully!")
 
+        print(f"{specialty.upper()} collection completed.")
+
+        total_pages += len(documents)
+        total_chunks += len(chunks)
+
+    # =================================================
+
+    print("\n" + "=" * 70)
+    print("Database Build Complete")
+    print("=" * 70)
+
+    print(f"Total Pages Indexed  : {total_pages}")
+    print(f"Total Chunks Indexed : {total_chunks}")
+    print(f"Database Location    : {DB_DIR}")
+
+    print("=" * 70)
+
+
+# =====================================================
+# Main
+# =====================================================
 
 if __name__ == "__main__":
-    # Ensure your directories exist
-    os.makedirs("data/cardiology", exist_ok=True)
-    os.makedirs("data/general_medicine", exist_ok=True)
 
-    print("🚀 Starting RAG Database Builder...")
+    # Create all required folders automatically
+
+    for folder in DATA_DIRS.values():
+        os.makedirs(folder, exist_ok=True)
+
     build_database()
