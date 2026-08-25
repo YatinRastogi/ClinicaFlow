@@ -363,6 +363,7 @@ def ask_one_question_node(state: PatientState) -> Dict[str, Any]:
         "memory_context": memory_context,
         "structured_data": json.dumps(structured_input, indent=2),
         "conversation_history": conversation_history,
+        "MAX_TURNS": MAX_TURNS,
     })
 
     try:
