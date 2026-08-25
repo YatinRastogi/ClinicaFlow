@@ -51,7 +51,6 @@ from utils.prompts import (
     intake_prompt,
     lab_prompt,
     medical_report_prompt,
-    next_question_prompt,
     question_refinement_prompt,
     triage_router_prompt,
 )
@@ -126,14 +125,19 @@ def retrieve_context_node(state: PatientState) -> Dict[str, Any]:
     # 1. Get the raw initial symptoms
     base_symptoms = state.get("raw_input", {}).get("symptoms", "")
 
-    # 2. Extract the dynamically gathered facts from the new memory state
+    # 2. Include dynamically gathered replies in the retrieval query
     interview_state = state.get("interview_state", {})
     known_facts = interview_state.get("known_facts", {})
+    patient_replies = interview_state.get("patient_replies", [])
 
     # 3. Build a highly contextual query string for ChromaDB
     # e.g., "chest pain. fever_duration: 3 days, pain_level: 7/10"
     facts_string = ", ".join([f"{k}: {v}" for k, v in known_facts.items()])
-    enhanced_query = f"{base_symptoms}. {facts_string}"
+    replies_string = "; ".join(
+        f"{item.get('question', '')} {item.get('reply', '')}"
+        for item in patient_replies
+    )
+    enhanced_query = f"{base_symptoms}. {facts_string}. {replies_string}".strip()
 
     print(f"--- SEARCH: Enhanced RAG Query: {enhanced_query} ---")
 

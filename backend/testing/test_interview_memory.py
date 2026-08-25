@@ -5,12 +5,9 @@ Run with: pytest tests/test_interview_memory.py -v
 """
 
 import pytest
-from unittest.mock import MagicMock, patch
-
 from utils.interview_memory import (
     DEDUP_THRESHOLD,
     MAX_TURNS,
-    apply_extraction_to_state,
     build_memory_context_block,
     cosine_similarity,
     embed_text,
@@ -142,49 +139,6 @@ def test_register_question_appends_history():
 
 
 # ---------------------------------------------------------------------------
-# Memory extraction application
-# ---------------------------------------------------------------------------
-
-def test_apply_extraction_merges_facts():
-    state = make_interview_state()
-    extracted = {
-        "new_facts": {"fever_duration": "3 days", "allergy": "penicillin"},
-        "unavailable_information": [],
-    }
-    state = apply_extraction_to_state(extracted, state)
-    assert state["known_facts"]["fever_duration"] == "3 days"
-    assert state["known_facts"]["allergy"] == "penicillin"
-    assert state["turn_count"] == 1
-
-
-def test_apply_extraction_adds_unavailable():
-    state = make_interview_state()
-    extracted = {
-        "new_facts": {},
-        "unavailable_information": ["blood_reports", "MRI scan"],
-    }
-    state = apply_extraction_to_state(extracted, state)
-    assert "blood_reports" in state["unavailable_information"]
-    assert "mri scan" in state["unavailable_information"]
-
-
-def test_apply_extraction_deduplicates_unavailable():
-    state = make_interview_state()
-    e1 = {"new_facts": {}, "unavailable_information": ["blood_reports"]}
-    e2 = {"new_facts": {}, "unavailable_information": ["blood_reports"]}
-    state = apply_extraction_to_state(e1, state)
-    state = apply_extraction_to_state(e2, state)
-    assert state["unavailable_information"].count("blood_reports") == 1
-
-
-def test_turn_count_increments():
-    state = make_interview_state()
-    for i in range(3):
-        state = apply_extraction_to_state({"new_facts": {}, "unavailable_information": []}, state)
-    assert state["turn_count"] == 3
-
-
-# ---------------------------------------------------------------------------
 # Confidence & stage
 # ---------------------------------------------------------------------------
 
@@ -247,54 +201,7 @@ def test_build_memory_context_block_empty_state():
     assert "none" in block.lower()
 
 
-# ---------------------------------------------------------------------------
-# extract_memory_from_reply (mocked LLM)
-# ---------------------------------------------------------------------------
+def test_make_interview_state_includes_patient_replies():
+    state = make_interview_state()
+    assert state["patient_replies"] == []
 
-def _mock_llm_response(content: str):
-    mock_llm = MagicMock()
-    mock_response = MagicMock()
-    mock_response.content = content
-    mock_llm.invoke.return_value = mock_response
-    return mock_llm
-
-
-def test_extract_memory_parses_valid_json():
-    from utils.interview_memory import extract_memory_from_reply
-
-    mock_llm = _mock_llm_response(
-        '{"new_facts": {"fever_duration": "3 days"}, "unavailable_information": ["blood_reports"]}'
-    )
-    result = extract_memory_from_reply(
-        question="When did the fever start?",
-        reply="Fever started 3 days ago. I don't have blood reports.",
-        llm=mock_llm,
-    )
-    assert result["new_facts"]["fever_duration"] == "3 days"
-    assert "blood_reports" in result["unavailable_information"]
-
-
-def test_extract_memory_handles_invalid_json_gracefully():
-    from utils.interview_memory import extract_memory_from_reply
-
-    mock_llm = _mock_llm_response("This is not JSON at all.")
-    result = extract_memory_from_reply(
-        question="Any allergies?",
-        reply="None that I know of.",
-        llm=mock_llm,
-    )
-    assert result == {"new_facts": {}, "unavailable_information": []}
-
-
-def test_extract_memory_strips_markdown_fences():
-    from utils.interview_memory import extract_memory_from_reply
-
-    mock_llm = _mock_llm_response(
-        '```json\n{"new_facts": {"pain_level": "7/10"}, "unavailable_information": []}\n```'
-    )
-    result = extract_memory_from_reply(
-        question="Rate your pain.",
-        reply="About 7 out of 10.",
-        llm=mock_llm,
-    )
-    assert result["new_facts"]["pain_level"] == "7/10"

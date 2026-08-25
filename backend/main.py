@@ -249,10 +249,18 @@ async def chat(
 
             current_values = dict(current_snapshot.values)
             messages = list(current_values.get("messages", []))
+            previous_question = next(
+                (message.get("content", "") for message in reversed(messages)
+                 if message.get("role") == "ai"),
+                "",
+            )
             messages.append({"role": "human", "content": human_answer})
             current_values["messages"] = messages
 
             interview_state = dict(current_values.get("interview_state") or make_interview_state())
+            patient_replies = list(interview_state.get("patient_replies", []))
+            patient_replies.append({"question": previous_question, "reply": human_answer})
+            interview_state["patient_replies"] = patient_replies
             interview_state["turn_count"] = int(interview_state.get("turn_count", 0)) + 1
             current_values["interview_state"] = interview_state
 
