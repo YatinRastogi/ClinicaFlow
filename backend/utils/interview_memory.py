@@ -11,8 +11,6 @@ with minimal disruption.
 
 from __future__ import annotations
 
-import json
-import re
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -54,6 +52,7 @@ def make_interview_state() -> Dict[str, Any]:
         "unavailable_information": [],
         "questions_asked": [],
         "pending_questions": [],
+        "patient_replies": [],
         "asked_embeddings": [],   # List[List[float]]
         "confidence_score": 0.0,
         "conversation_stage": "gathering",
@@ -133,116 +132,6 @@ def register_question(
 
 
 # ---------------------------------------------------------------------------
-# Memory extraction (LLM-driven)
-# ---------------------------------------------------------------------------
-
-EXTRACTION_SYSTEM_PROMPT = """\
-You are a clinical data extraction AI.
-
-Given a patient's reply during a medical interview, extract:
-1. New clinical facts stated (free-form; DO NOT use fixed keys)
-2. Items the patient says they do not have, cannot recall, or refuse to share
-
-Output ONLY a single JSON object — no commentary, no markdown fences.
-
-Schema:
-{
-  "new_facts": {
-    "<descriptive_key>": "<value>"
-  },
-  "unavailable_information": ["<item1>", "<item2>"]
-}
-
-Rules:
-- Keys in new_facts must be concise snake_case descriptions  
-  (e.g. "fever_duration", "allergy_penicillin", "last_meal_time")
-- If nothing new was stated, return empty dicts/lists
-- "unavailable_information" captures ONLY explicit refusals or absences,
-  NOT missing data the patient simply hasn't mentioned yet
-"""
-
-EXTRACTION_HUMAN_TEMPLATE = """\
-Current question that was asked:
-\"\"\"{question}\"\"\"
-
-Patient reply:
-\"\"\"{reply}\"\"\"
-
-Extract new facts and unavailable information.
-"""
-
-
-def extract_memory_from_reply(
-    question: str,
-    reply: str,
-    llm,  # any LangChain chat model
-) -> Dict[str, Any]:
-    """
-    Run a lightweight LLM pass to extract structured facts from one patient reply.
-
-    Returns dict with keys:
-        new_facts              : dict
-        unavailable_information: list[str]
-    """
-    from langchain_core.messages import HumanMessage, SystemMessage
-
-    messages = [
-        SystemMessage(content=EXTRACTION_SYSTEM_PROMPT),
-        HumanMessage(
-            content=EXTRACTION_HUMAN_TEMPLATE.format(
-                question=question, reply=reply
-            )
-        ),
-    ]
-
-    response = llm.invoke(messages)
-    raw = response.content.strip()
-
-    # Strip accidental markdown fences
-    raw = re.sub(r"^```(?:json)?", "", raw, flags=re.MULTILINE).strip()
-    raw = re.sub(r"```$", "", raw, flags=re.MULTILINE).strip()
-
-    try:
-        extracted = json.loads(raw)
-    except json.JSONDecodeError:
-        # Graceful fallback — don't crash the interview
-        extracted = {"new_facts": {}, "unavailable_information": []}
-
-    # Sanitise types
-    if not isinstance(extracted.get("new_facts"), dict):
-        extracted["new_facts"] = {}
-    if not isinstance(extracted.get("unavailable_information"), list):
-        extracted["unavailable_information"] = []
-
-    return extracted
-
-
-def apply_extraction_to_state(
-    extracted: Dict[str, Any],
-    interview_state: Dict[str, Any],
-) -> Dict[str, Any]:
-    """
-    Merge extraction results into interview_state.
-    Returns the mutated interview_state.
-    """
-    # Merge new facts
-    interview_state["known_facts"].update(extracted.get("new_facts", {}))
-
-    # Add newly discovered unavailabilities (deduplicate)
-    existing_unavailable = set(interview_state["unavailable_information"])
-    for item in extracted.get("unavailable_information", []):
-        normalised = item.strip().lower()
-        if normalised and normalised not in existing_unavailable:
-            interview_state["unavailable_information"].append(normalised)
-            existing_unavailable.add(normalised)
-
-    # Increment turn counter
-    interview_state["turn_count"] = interview_state.get("turn_count", 0) + 1
-
-    return interview_state
-
-
-# ---------------------------------------------------------------------------
 # Confidence & stage helpers
 # ---------------------------------------------------------------------------
 
@@ -301,6 +190,7 @@ def build_memory_context_block(interview_state: Dict[str, Any]) -> str:
     known = interview_state.get("known_facts", {})
     unavailable = interview_state.get("unavailable_information", [])
     questions = interview_state.get("questions_asked", [])
+    patient_replies = interview_state.get("patient_replies", [])
     stage = interview_state.get("conversation_stage", "gathering")
     turns = interview_state.get("turn_count", 0)
     confidence = interview_state.get("confidence_score", 0.0)
@@ -318,6 +208,14 @@ def build_memory_context_block(interview_state: Dict[str, Any]) -> str:
         if questions
         else "  (none yet)"
     )
+    replies_str = (
+        "\n".join(
+            f"  {idx+1}. Q: {item.get('question', '')}\n     A: {item.get('reply', '')}"
+            for idx, item in enumerate(patient_replies)
+        )
+        if patient_replies
+        else "  (none yet)"
+    )
 
     return f"""\
 === INTERVIEW MEMORY CONTEXT ===
@@ -333,4 +231,7 @@ Unavailable Information (patient CANNOT / WILL NOT provide — DO NOT ask again)
 
 Questions Already Asked (DO NOT ask semantically equivalent questions):
 {questions_str}
+
+Patient Replies (use these answers as gathered clinical information):
+{replies_str}
 ================================="""
