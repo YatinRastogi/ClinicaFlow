@@ -5,11 +5,16 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# Virtual Environment
+# ==========================
+# Virtual Environments
+# ==========================
 .venv/
 venv/
+env/
 
+# ==========================
 # Environment Variables
+# ==========================
 .env
 *.env
 
@@ -19,34 +24,42 @@ venv/
 *.db
 *.sqlite3
 
-# Chroma DB
+# ChromaDB
 backend/chroma_db/
 
 # ==========================
-# IDE
+# IDEs & Editors
 # ==========================
-.idea/
 .vscode/
+.idea/
 *.iml
 
 # ==========================
-# Generated Reports
+# Generated Files
 # ==========================
 *.pdf
 backend/generated_reports/
 backend/temp_uploads/
 
 # ==========================
-# Test Files
+# Testing
 # ==========================
+backend/testing/
 backend/test_*.py
 
 # ==========================
-# OS Files
+# Google OAuth
+# ==========================
+backend/token.json
+backend/credentials.json
+
+# ==========================
+# Operating System
 # ==========================
 .DS_Store
 Thumbs.db
 
-# Google OAuth
-backend/token.json
-backend/credentials.json
+# ==========================
+# Miscellaneous
+# ==========================
+Sample Reports/
