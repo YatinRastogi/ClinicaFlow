@@ -138,6 +138,22 @@ def seed_doctors():
     finally:
         db.close()
 
+# Admin endpoints for LLM metrics and cache control
+from utils import get_llm_metrics, clear_llm_cache
+
+@app.get("/admin/llm-metrics")
+def admin_llm_metrics():
+    """Return collected LLM call and token metrics for debugging and optimization.
+    Lightweight and unauthenticated for now; add auth if exposing to public networks.
+    """
+    return get_llm_metrics()
+
+@app.post("/admin/clear-llm-cache")
+def admin_clear_llm_cache():
+    """Clear the in-process LLM response cache. Useful during development/testing."""
+    clear_llm_cache()
+    return {"cleared": True}
+
 @app.post("/login")
 def login_unified(patient: PatientLogin, db: Session = Depends(get_db)):
     """Handles login for both patients and doctors, checking credentials and returning the corresponding profile."""
