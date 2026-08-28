@@ -1,0 +1,1857 @@
+[
+    {
+        "id": 1,
+        "specialty": "cardiology",
+        "question": "A 60-year-old man has crushing chest pain radiating to the left arm for 30 minutes. What is the most likely diagnosis and initial investigations?",
+        "ground_truth": "Acute coronary syndrome should be suspected. Initial investigations include ECG and cardiac troponins.",
+        "answer": "**Most likely diagnosis**  \nAcute coronary syndrome – most probably an acute myocardial infarction (ST‑segment–elevation MI is the classic presentation of crushing, left‑arm‑radiating chest pain).\n\n**Initial investigations (per the retrieved guidance)**  \n\n1. **12‑lead ECG** – obtain within 10 minutes of arrival; repeat serial ECGs to look for ST‑segment changes.  \n2. **Cardiac biomarkers** – baseline high‑sensitivity troponin (or CK‑MB) with repeat measurement in 3–6 h to differentiate STEMI, NSTEMI, or unstable angina.  \n3. **Pulse oximetry** – assess oxygen saturation.  \n4. **Chest radiograph** – to exclude mediastinal widening (aortic dissection) and other thoracic pathology.  \n5. **If hemodynamically unstable** – point‑of‑care ultrasound/echocardiography to evaluate ventricular function, pericardial effusion, or right‑ventricular overload.  \n\nThese investigations are performed immediately to confirm the diagnosis and to determine the need for emergent reperfusion (e.g., primary PCI or fibrinolysis).",
+        "retrieval_time": 0.09082603454589844,
+        "generation_time": 1.6444578170776367,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "51ce958a-e50e-4f6e-a9b3-e32966188208",
+                "source_file": "Acute_Coronary_Syndrome_Complete.pdf",
+                "page": 33,
+                "specialty": "cardiology",
+                "score": 0.6774108664098916
+            },
+            {
+                "chunk_id": "ff85877a-a57a-4b71-a7fa-ace95a5b3055",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "cardiology",
+                "score": 0.6731011404154101
+            },
+            {
+                "chunk_id": "b72826fc-13ee-485c-8ce2-d5b64480bcca",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.6242598761478639
+            },
+            {
+                "chunk_id": "4c62fd86-79a3-4db5-999b-7814b65f2df4",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 11,
+                "specialty": "cardiology",
+                "score": 0.6239743312492027
+            },
+            {
+                "chunk_id": "5815f320-3e1c-45df-81e5-899fc3ebb445",
+                "source_file": "8 Limb Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "131302a4-69f2-462d-858b-44746ef1f706",
+                "source_file": "31 Hypertrophic Cardiomyopathy - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "specialty": "cardiology",
+        "question": "A patient has orthopnea, leg swelling and elevated BNP. What condition is most likely?",
+        "ground_truth": "Heart failure is likely. Echocardiography should be performed.",
+        "answer": "The presentation of orthopnea, peripheral edema, and a raised serum BNP is most consistent with **congestive (cardiac) heart failure**.  \n\n**Suggested investigations**  \n- Chest radiograph or thoracic ultrasound to look for pulmonary congestion/edema.  \n- Transthoracic echocardiography to assess ventricular function and valvular disease.  \n- Routine labs (CBC, electrolytes, renal function, thyroid studies) as recommended for heart‑failure work‑up.  ",
+        "retrieval_time": 0.049527883529663086,
+        "generation_time": 0.9208850860595703,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "42fb99ba-a20a-4c4f-b9c1-b5e2166d1950",
+                "source_file": "8 Limb Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6162083950894339
+            },
+            {
+                "chunk_id": "5c0a5a97-2f86-4cf3-a8c6-b68c2281733f",
+                "source_file": "4 Edema - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.5998026921597198
+            },
+            {
+                "chunk_id": "377bfc86-1f86-4872-80ad-a626b31770c3",
+                "source_file": "Heart_Failure_Complete.pdf",
+                "page": 6,
+                "specialty": "cardiology",
+                "score": 0.5947539633234484
+            },
+            {
+                "chunk_id": "231fabec-9aa4-4198-954a-99bfb3ffec44",
+                "source_file": "Heart_Failure_Complete.pdf",
+                "page": 23,
+                "specialty": "cardiology",
+                "score": 0.5884831023209065
+            },
+            {
+                "chunk_id": "6b0ea964-13b3-443f-a3bf-28a5ac271f0e",
+                "source_file": "38 Peripheral Artery Disease - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "1e46884e-c67c-4d37-81bb-04012bdaafe0",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 28,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "specialty": "cardiology",
+        "question": "A patient develops sudden tearing chest pain radiating to the back. What emergency should be suspected?",
+        "ground_truth": "Aortic dissection should be suspected.",
+        "answer": "The presentation is classic for **acute aortic dissection** – a life‑threatening emergency.  \n\n**Key red‑flag features**  \n- Sudden, tearing chest pain that radiates to the back  \n- Possible abnormal vital signs (e.g., hypotension, pulse deficits)  \n\n**Immediate investigations**  \n- **Chest radiograph** – look for mediastinal widening  \n- **Urgent CT‑angiography of the chest** (or MRI/TEE if CT unavailable) to confirm the dissection  \n- **ECG and cardiac biomarkers** to exclude concurrent myocardial ischemia  \n\nPrompt recognition and rapid imaging are essential to initiate definitive surgical or endovascular management.",
+        "retrieval_time": 0.03720402717590332,
+        "generation_time": 1.071474552154541,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "51ce958a-e50e-4f6e-a9b3-e32966188208",
+                "source_file": "Acute_Coronary_Syndrome_Complete.pdf",
+                "page": 33,
+                "specialty": "cardiology",
+                "score": 0.6680590075609305
+            },
+            {
+                "chunk_id": "ee177e51-50d8-499d-96be-5c49539b740d",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "cardiology",
+                "score": 0.6565507262813339
+            },
+            {
+                "chunk_id": "cc9076f6-1b27-47cc-b740-1b7138bed285",
+                "source_file": "7 Syncope - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "cardiology",
+                "score": 0.6485845925911384
+            },
+            {
+                "chunk_id": "4c62fd86-79a3-4db5-999b-7814b65f2df4",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 11,
+                "specialty": "cardiology",
+                "score": 0.630927971197621
+            },
+            {
+                "chunk_id": "87e6f405-7781-4cec-b527-ca7542c0fcef",
+                "source_file": "Acute_Coronary_Syndrome_Complete.pdf",
+                "page": 110,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "d312a142-c0ba-47f8-a390-84d6027a0f26",
+                "source_file": "8 Limb Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "specialty": "cardiology",
+        "question": "A patient presents with swollen painful calf after prolonged immobilization. What is the likely diagnosis?",
+        "ground_truth": "Deep venous thrombosis.",
+        "answer": "**Likely diagnosis:** Deep venous thrombosis (DVT) of the calf.\n\n**Rationale from the retrieved text**  \n- Prolonged immobilization is a recognized predisposing factor for DVT.  \n- Swollen, painful calf is a classic presentation; the Wells criteria list calf tenderness, swelling > 3 cm, pitting edema, and dilated superficial veins as points toward DVT.  \n\n**Suggested investigations**  \n- Compression duplex ultrasonography of the affected leg (first‑line test).  \n- D‑dimer assay (if pre‑test probability is low to moderate).  \n\n**Emergency red flags to watch for**  \n- Sudden, severe calf pain.  \n- Signs of acute limb ischemia (coolness, pallor, absent pulses).  \n- Dyspnea, chest pain, or sweating (possible pulmonary embolism).  \n- Systemic toxicity (tachycardia, hypotension, altered mental status).  \n\nPrompt imaging and anticoagulation are indicated if DVT is confirmed or highly suspected.",
+        "retrieval_time": 0.0632483959197998,
+        "generation_time": 6.180483341217041,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "cf4dc25b-ce6f-4f1e-9f75-e13c692ff4e0",
+                "source_file": "Deep_Venous_Thrombosis_Complete.pdf",
+                "page": 4,
+                "specialty": "cardiology",
+                "score": 0.6138862723238776
+            },
+            {
+                "chunk_id": "42fb99ba-a20a-4c4f-b9c1-b5e2166d1950",
+                "source_file": "8 Limb Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6072866237561023
+            },
+            {
+                "chunk_id": "3b6c4e4d-1549-4c75-b444-22824ba04d9b",
+                "source_file": "Deep_Venous_Thrombosis_Complete.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6032435187253007
+            },
+            {
+                "chunk_id": "7b994211-863e-4265-bcfe-baa1bc9475ae",
+                "source_file": "4 Edema - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "cardiology",
+                "score": 0.5945736591055187
+            },
+            {
+                "chunk_id": "d69b26b6-5422-4231-b5dd-f998874944c5",
+                "source_file": "4 Edema - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "6b0ea964-13b3-443f-a3bf-28a5ac271f0e",
+                "source_file": "38 Peripheral Artery Disease - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "specialty": "cardiology",
+        "question": "Sharp chest pain improves while sitting forward and worsens when lying down. What is the diagnosis?",
+        "ground_truth": "Acute pericarditis.",
+        "answer": "**Likely diagnosis:** Acute pericarditis – classically presents with sharp chest pain that is relieved by sitting forward and worsens when the patient lies supine.  \n\n**Suggested investigations**  \n- 12‑lead ECG (look for diffuse ST‑segment elevation and PR‑segment depression)  \n- Transthoracic echocardiography (to assess for pericardial effusion or tamponade)  \n- Inflammatory markers (CRP, ESR) and basic labs (CBC, troponin to exclude myocardial injury)  \n\n**Emergency red‑flags** to watch for  \n- Hypotension, tachycardia, or pulsus paradoxus > 10 mm Hg (possible tamponade)  \n- New or worsening dyspnea, syncope, or signs of shock  \n\nIf any red‑flag signs are present, urgent cardiology evaluation and possible pericardial drainage are indicated.",
+        "retrieval_time": 0.052335500717163086,
+        "generation_time": 19.33814239501953,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "b72826fc-13ee-485c-8ce2-d5b64480bcca",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.6335511067552421
+            },
+            {
+                "chunk_id": "949e4e9c-0220-4831-a215-3b875735fa2d",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6204942659676582
+            },
+            {
+                "chunk_id": "a3098d39-258f-430e-aba3-ee6118f1d1ad",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "cardiology",
+                "score": 0.6189338631952392
+            },
+            {
+                "chunk_id": "ee177e51-50d8-499d-96be-5c49539b740d",
+                "source_file": "3 Chest Pain - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "cardiology",
+                "score": 0.6140625304443502
+            },
+            {
+                "chunk_id": "ea3a3ab8-733d-440e-9495-6d10bd2f58a3",
+                "source_file": "Acute_Coronary_Syndrome_Complete.pdf",
+                "page": 4,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "83a89019-a0c4-4b80-98d8-0be862530dbf",
+                "source_file": "Acute_Coronary_Syndrome_Complete.pdf",
+                "page": 43,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "specialty": "cardiology",
+        "question": "Which investigation is considered the primary imaging modality for evaluating heart failure?",
+        "ground_truth": "Echocardiography.",
+        "answer": "Transthoracic **echocardiography** is regarded as the initial (primary) imaging modality for the evaluation of heart failure, allowing assessment of left‑ventricular ejection fraction, diastolic function, valvular disease and other structural abnormalities.",
+        "retrieval_time": 0.04402422904968262,
+        "generation_time": 16.038429021835327,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "317fc82c-bc36-4868-9f55-8cf578a8c820",
+                "source_file": "Heart_Failure_Complete.pdf",
+                "page": 33,
+                "specialty": "cardiology",
+                "score": 0.7035520488037128
+            },
+            {
+                "chunk_id": "a5f67a66-de88-4b7c-8906-d5fcf1d238c2",
+                "source_file": "Heart_Failure_Complete.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6828968055791909
+            },
+            {
+                "chunk_id": "3c051097-764d-4be8-a5e0-55689b74508d",
+                "source_file": "Heart_Failure_Complete.pdf",
+                "page": 34,
+                "specialty": "cardiology",
+                "score": 0.6800239077972943
+            },
+            {
+                "chunk_id": "46979d0f-14a1-4f11-9a09-a965e31e5542",
+                "source_file": "9 Echocardiography - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.6791256320149816
+            },
+            {
+                "chunk_id": "b39f977a-b7ea-492c-bb41-6643c1862d5a",
+                "source_file": "11 Cardiac Imaging Tests - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "cardiology",
+                "score": 0.6543144144993459
+            },
+            {
+                "chunk_id": "d2ea1328-9cce-44f0-9779-cd06aedfd5d6",
+                "source_file": "33 Myocarditis - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "specialty": "cardiology",
+        "question": "Persistent hypertension despite medication should prompt evaluation for what secondary cause?",
+        "ground_truth": "Renovascular hypertension.",
+        "answer": "Persistent hypertension that remains uncontrolled despite appropriate medication should prompt evaluation for **primary (primary‑aldosterone) hyperaldosteronism** – the most common cause of secondary hypertension.  \n\n**Suggested investigations**  \n- Plasma aldosterone concentration (PAC) and plasma renin activity (PRA) with calculation of the aldosterone‑renin ratio (ARR).  \n- If the ARR is elevated, confirmatory testing (e.g., saline‑infusion suppression test, oral sodium loading, or fludrocortisone suppression test).  \n- Basic labs (electrolytes, especially serum potassium) and renal function to support interpretation.  \n\n**Red‑flag considerations**  \n- Severe or resistant hypertension (BP > 180/110 mm Hg) or evidence of target‑organ damage warrants urgent assessment for secondary causes, including primary aldosteronism.  \n\nIf testing confirms primary aldosteronism, referral for imaging (adrenal CT) and specialist management is indicated.",
+        "retrieval_time": 0.04560208320617676,
+        "generation_time": 16.348995447158813,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "01c3d146-07f1-4058-befa-17c871d391c3",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.7339352693533069
+            },
+            {
+                "chunk_id": "a657e7df-ce05-48f4-a420-2f3b7a5c6e7f",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 21,
+                "specialty": "cardiology",
+                "score": 0.6513818789268064
+            },
+            {
+                "chunk_id": "f64fcca8-7b08-4ae5-bc41-c8b0c17d3af9",
+                "source_file": "5 Orthostatic Hypotension - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "cardiology",
+                "score": 0.6478127995012068
+            },
+            {
+                "chunk_id": "40bf0c39-db81-4271-a368-c70c7424dfeb",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 13,
+                "specialty": "cardiology",
+                "score": 0.6393012012975834
+            },
+            {
+                "chunk_id": "6bcfbde6-37aa-440d-bc6a-948d09a47cc2",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 16,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "83590790-fb88-4eb7-af4b-07fd8756e72c",
+                "source_file": "Hypertension_Complete.pdf",
+                "page": 29,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "specialty": "cardiology",
+        "question": "Fever with a new heart murmur raises suspicion for which cardiac disease?",
+        "ground_truth": "Infective endocarditis.",
+        "answer": "Fever together with a new cardiac murmur should raise suspicion for **infective endocarditis**.  \n\n**Key investigations**  \n- Obtain multiple **blood cultures** before starting antibiotics.  \n- Perform **transthoracic (or transesophageal) echocardiography** to look for valvular vegetations or complications.  \n\n**Emergency red flags**  \n- Persistent high‑grade fever, hemodynamic instability, or signs of heart failure.  \n- Embolic phenomena (e.g., Roth spots, petechiae, septic pulmonary emboli).  \n\nPrompt recognition and diagnostic work‑up are essential for timely antimicrobial therapy and possible surgical intervention.",
+        "retrieval_time": 0.03766345977783203,
+        "generation_time": 17.525768041610718,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "f866715f-6b85-4bfb-bef5-319dc835cdae",
+                "source_file": "35 Infective Endocarditis - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "cardiology",
+                "score": 0.7011023686011384
+            },
+            {
+                "chunk_id": "23ad38a2-224d-4a99-820c-4dda5845e563",
+                "source_file": "35 Infective Endocarditis - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "cardiology",
+                "score": 0.6618884139109962
+            },
+            {
+                "chunk_id": "cad56fdd-c87c-4b95-95f6-1b17ece5d58a",
+                "source_file": "35 Infective Endocarditis - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "cardiology",
+                "score": 0.6566313321291111
+            },
+            {
+                "chunk_id": "131302a4-69f2-462d-858b-44746ef1f706",
+                "source_file": "31 Hypertrophic Cardiomyopathy - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "cardiology",
+                "score": 0.6371716053360249
+            },
+            {
+                "chunk_id": "cdfd192b-f28e-47e9-aad0-a97f76d48e2f",
+                "source_file": "2 Cardiac Auscultation - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 11,
+                "specialty": "cardiology",
+                "score": null
+            },
+            {
+                "chunk_id": "1f2bd435-8d92-43cb-a998-0dcc62537626",
+                "source_file": "33 Myocarditis - Cardiology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "cardiology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "specialty": "pulmonology",
+        "question": "A young patient presents with episodic wheezing and shortness of breath that improves with bronchodilators. What is the likely diagnosis?",
+        "ground_truth": "Asthma.",
+        "answer": "**Likely diagnosis:** Asthma – episodic wheeze and dyspnea that are reversible with bronchodilator therapy are classic features.\n\n**Suggested investigations**  \n- Pulmonary function testing with pre‑ and post‑bronchodilator spirometry to document reversible airflow obstruction.  \n- If spirometry is nondiagnostic, a methacholine challenge can demonstrate airway hyper‑responsiveness.  \n\n**Emergency red flags** (warrant immediate evaluation)  \n- Severe or rapidly worsening dyspnea, use of accessory muscles, tripod positioning, or pursed‑lip breathing.  \n- Hypoxemia (SpO₂ < 90 %) or hypercapnia (PaCO₂ > 50 mm Hg) on arterial/venous blood gas.  \n\nIf none of these red flags are present, the presentation is most consistent with asthma.",
+        "retrieval_time": 0.11380600929260254,
+        "generation_time": 15.132152318954468,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "d54b2a63-c823-401b-88fe-38b89e1c29ac",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "pulmonology",
+                "score": 0.6679277201278191
+            },
+            {
+                "chunk_id": "c0edec8d-ae40-4fca-a25b-dd4f3c378e69",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 55,
+                "specialty": "pulmonology",
+                "score": 0.656196650606994
+            },
+            {
+                "chunk_id": "49db4e54-de01-4cb1-875a-b978b9bf8f90",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 52,
+                "specialty": "pulmonology",
+                "score": 0.6463582696122474
+            },
+            {
+                "chunk_id": "7b644f31-e8f5-4b6c-8726-6a8840ac2826",
+                "source_file": "COPD_Complete.pdf",
+                "page": 16,
+                "specialty": "pulmonology",
+                "score": null
+            },
+            {
+                "chunk_id": "a11cf362-723b-43b4-a781-45bd68a8706e",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 16,
+                "specialty": "pulmonology",
+                "score": null
+            },
+            {
+                "chunk_id": "f01171e2-e251-423a-92d3-ab2dbd75053a",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 14,
+                "specialty": "pulmonology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "specialty": "pulmonology",
+        "question": "An elderly smoker has chronic productive cough for years. What chronic disease should be considered?",
+        "ground_truth": "Chronic obstructive pulmonary disease.",
+        "answer": "The chronic disease to consider is **chronic obstructive pulmonary disease (COPD)** – most often the chronic‑bronchitis phenotype, which presents with a productive cough in long‑term smokers.  \n\n**Suggested investigations**  \n- Spirometry with bronchodilator response to confirm airflow limitation (FEV₁/FVC < 0.70).  \n- Chest radiograph (or CT if indicated) to assess for hyperinflation, emphysema, or other pathology.  \n\n**Emergency red flags** (warrant immediate evaluation)  \n- New or worsening dyspnea, especially at rest.  \n- Fever, pleuritic chest pain, or hemoptysis.  \n- Rapid weight loss, night sweats, or signs of respiratory failure (tachypnea, hypoxia).  \n\nConsider further assessment for comorbidities (e.g., heart failure, lung cancer) if red flags are present.",
+        "retrieval_time": 0.04619550704956055,
+        "generation_time": 17.078686714172363,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "377f2106-8ce7-479c-a713-9f0b7233de93",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "pulmonology",
+                "score": 0.7052247940008374
+            },
+            {
+                "chunk_id": "7f136f42-c331-47c4-9ff1-41a90558ee99",
+                "source_file": "COPD_Complete.pdf",
+                "page": 7,
+                "specialty": "pulmonology",
+                "score": 0.6823471053074874
+            },
+            {
+                "chunk_id": "68e9cc36-f6b9-4fe0-bce6-d78a1d2db425",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "pulmonology",
+                "score": 0.66367609356401
+            },
+            {
+                "chunk_id": "d54b2a63-c823-401b-88fe-38b89e1c29ac",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "pulmonology",
+                "score": 0.6380489762814762
+            },
+            {
+                "chunk_id": "2136fc14-aee5-486f-b01b-bad08ef5c8d8",
+                "source_file": "COPD_Complete.pdf",
+                "page": 34,
+                "specialty": "pulmonology",
+                "score": 0.6225339205544944
+            },
+            {
+                "chunk_id": "0eb1e968-bafc-4830-bd72-5f3ea5314b4b",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "pulmonology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "specialty": "pulmonology",
+        "question": "Fever, productive cough and lobar consolidation on chest imaging suggest which diagnosis?",
+        "ground_truth": "Community-acquired pneumonia.",
+        "answer": "The presentation of fever, a productive cough and a lobar consolidation on chest imaging is most consistent with **pneumonia** (most often bacterial).  \n\n**Relevant investigations**  \n- Sputum (and, if indicated, pleural‑fluid or blood) cultures to identify the causative organism.  \n- Consider bronchoalveolar lavage or bronchial washings in severely ill or hospital‑acquired cases.  \n- Pulse oximetry and, when severity is uncertain, arterial blood gas to assess oxygenation.  \n\n**Emergency red flags** (to watch for) include marked dyspnea, hypoxia, hypotension or altered mental status, which would warrant urgent hospital evaluation.",
+        "retrieval_time": 0.050687551498413086,
+        "generation_time": 18.337647676467896,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "4343f4ef-c262-4984-af0c-62c00db5c417",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "pulmonology",
+                "score": 0.6655442315508311
+            },
+            {
+                "chunk_id": "c045e6cf-810f-48f2-a9f5-99808b713cae",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "pulmonology",
+                "score": 0.6572015157691906
+            },
+            {
+                "chunk_id": "377f2106-8ce7-479c-a713-9f0b7233de93",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "pulmonology",
+                "score": 0.6426885435124039
+            },
+            {
+                "chunk_id": "c01db992-20d4-4de9-a1ff-ff3a64473878",
+                "source_file": "2 Cough in Adults - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "pulmonology",
+                "score": 0.6318881185535477
+            },
+            {
+                "chunk_id": "4af8dfe8-20ce-47e6-a628-1d792482cf84",
+                "source_file": "COPD_Complete.pdf",
+                "page": 14,
+                "specialty": "pulmonology",
+                "score": null
+            },
+            {
+                "chunk_id": "a572d568-e0c5-437b-8591-1f402ec4c5fa",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "pulmonology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 12,
+        "specialty": "pulmonology",
+        "question": "Sudden dyspnea after prolonged travel should raise suspicion for which pulmonary emergency?",
+        "ground_truth": "Pulmonary embolism.",
+        "answer": "**Pulmonary embolism** should be suspected when a patient develops sudden dyspnea after prolonged travel.\n\n- **Key red‑flags**: abrupt dyspnea, sharp chest pain, tachypnea, tachycardia, and recent immobilization or long‑distance travel.\n- **Initial investigations**: pulse oximetry, ECG, and urgent **CT pulmonary angiography** (or V/Q scan if CT unavailable) to confirm the diagnosis.",
+        "retrieval_time": 0.04444074630737305,
+        "generation_time": 17.967259407043457,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "5b068f39-f66a-490a-8b38-6429d1658392",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "pulmonology",
+                "score": 0.6940325930116482
+            },
+            {
+                "chunk_id": "62622b80-3664-4bb5-a4da-66e3b7a4b28b",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "pulmonology",
+                "score": 0.6773667597329249
+            },
+            {
+                "chunk_id": "acb384b4-482b-4c34-ba04-af3ff2d187ef",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "pulmonology",
+                "score": 0.6640441409186313
+            },
+            {
+                "chunk_id": "0dbd828b-4e4e-465a-8c2f-d5b58d33f177",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "pulmonology",
+                "score": 0.643538097537838
+            },
+            {
+                "chunk_id": "d498d542-dac4-4c61-90c0-19f7cfce3dd1",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "pulmonology",
+                "score": 0.6338600853016754
+            },
+            {
+                "chunk_id": "a572d568-e0c5-437b-8591-1f402ec4c5fa",
+                "source_file": "3 Dyspnea - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "pulmonology",
+                "score": 0.6291363508142714
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "specialty": "pulmonology",
+        "question": "What symptom most commonly characterizes asthma exacerbation?",
+        "ground_truth": "Shortness of breath with wheezing.",
+        "answer": "I don't have enough information from the retrieved documents.",
+        "retrieval_time": 0.041315317153930664,
+        "generation_time": 17.187352895736694,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "f01171e2-e251-423a-92d3-ab2dbd75053a",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 14,
+                "specialty": "pulmonology",
+                "score": 0.7175680254228591
+            },
+            {
+                "chunk_id": "958b778f-ac7b-47ff-a56e-4f350c7f1cb4",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 45,
+                "specialty": "pulmonology",
+                "score": 0.655858337853997
+            },
+            {
+                "chunk_id": "e729d593-1d0f-44e8-b415-d0833c97a682",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 7,
+                "specialty": "pulmonology",
+                "score": 0.6320429239281282
+            },
+            {
+                "chunk_id": "08bc227f-69c1-413c-9df0-f1e6a91474b5",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 15,
+                "specialty": "pulmonology",
+                "score": 0.6220461972235263
+            },
+            {
+                "chunk_id": "988e0253-edf6-4a16-8cf4-092ce7ecfd39",
+                "source_file": "Asthma_Complete.pdf",
+                "page": 6,
+                "specialty": "pulmonology",
+                "score": null
+            },
+            {
+                "chunk_id": "7b644f31-e8f5-4b6c-8726-6a8840ac2826",
+                "source_file": "COPD_Complete.pdf",
+                "page": 16,
+                "specialty": "pulmonology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 14,
+        "specialty": "pulmonology",
+        "question": "What is an important investigation in suspected pulmonary embolism?",
+        "ground_truth": "CT pulmonary angiography.",
+        "answer": "**CT pulmonary angiography (CTPA)** is the primary diagnostic investigation for a patient in whom pulmonary embolism is suspected. It provides rapid, high‑sensitivity imaging of the pulmonary arteries and is the standard test to confirm or exclude PE. (If CTPA is contraindicated, a ventilation‑perfusion scan may be used.)",
+        "retrieval_time": 0.04073357582092285,
+        "generation_time": 16.910824060440063,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "c06a28b7-5237-4257-8749-856c9ca6e09c",
+                "source_file": "11 Pulmonary Embolism (PE) - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "pulmonology",
+                "score": 0.7047564371467601
+            },
+            {
+                "chunk_id": "98dcf4d4-8c83-4930-b36f-356240f959a4",
+                "source_file": "11 Pulmonary Embolism (PE) - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 12,
+                "specialty": "pulmonology",
+                "score": 0.701184259927795
+            },
+            {
+                "chunk_id": "f2a03a80-94fc-4fc4-8092-49a1df0f9626",
+                "source_file": "11 Pulmonary Embolism (PE) - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 30,
+                "specialty": "pulmonology",
+                "score": 0.6864979376830829
+            },
+            {
+                "chunk_id": "348b1b18-7c41-441a-8244-2e3a0107070c",
+                "source_file": "11 Pulmonary Embolism (PE) - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "pulmonology",
+                "score": 0.6852162520198666
+            },
+            {
+                "chunk_id": "cbc92470-976b-444b-907c-2733f864cd86",
+                "source_file": "11 Pulmonary Embolism (PE) - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "pulmonology",
+                "score": 0.6783812343765822
+            },
+            {
+                "chunk_id": "fa07e3ca-af46-44de-bab7-204fd6c9d30a",
+                "source_file": "1 Evaluation of the Patient With Pulmonary Issues - Pulmonology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "pulmonology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "specialty": "gastroenterology",
+        "question": "Burning retrosternal pain after meals is characteristic of which disease?",
+        "ground_truth": "Gastroesophageal reflux disease.",
+        "answer": "**Disease:** Gastroesophageal reflux disease (GERD) – reflux of gastric contents into the esophagus produces a burning retrosternal pain that is often precipitated by meals.  \n\n**Relevant investigations:**  \n- Upper endoscopy (esophagogastroduodenoscopy) to assess for esophagitis, strictures, or Barrett’s changes.  \n- Ambulatory esophageal pH monitoring (or combined pH‑impedance study) when the diagnosis is uncertain.  \n\n**Emergency red‑flags to watch for:**  \n- Dysphagia or odynophagia, especially progressive.  \n- Unexplained weight loss.  \n- Hematemesis, melena, or anemia suggesting upper GI bleeding.  \n- Persistent vomiting or severe chest pain that could indicate perforation or other acute pathology.  \n\nThese findings point to GERD as the condition most characteristically associated with burning retrosternal pain after eating.",
+        "retrieval_time": 0.06165814399719238,
+        "generation_time": 17.718446493148804,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "882a5091-aeeb-4d60-ae2f-80922c6a9b74",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.5697862545592918
+            },
+            {
+                "chunk_id": "92f2a42b-9d2e-44ac-889e-d58878bed415",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "gastroenterology",
+                "score": 0.5565855665777402
+            },
+            {
+                "chunk_id": "1b30e13d-a597-4122-96fa-2aec35b9a9e7",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "gastroenterology",
+                "score": 0.5370934920784218
+            },
+            {
+                "chunk_id": "bd197195-daae-4314-afe6-a49434afd2e8",
+                "source_file": "15 Gastroesophageal Reflux Disease (GERD) - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "gastroenterology",
+                "score": 0.5367442632916606
+            },
+            {
+                "chunk_id": "f134f6d9-addb-4896-aa5f-bbec2d159035",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "gastroenterology",
+                "score": null
+            },
+            {
+                "chunk_id": "c6e7d9d9-caba-4f86-ac82-fa86cdb7ccfe",
+                "source_file": "17 Acute Pancreatitis - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 16,
+        "specialty": "gastroenterology",
+        "question": "Severe epigastric pain radiating to the back suggests which diagnosis?",
+        "ground_truth": "Acute pancreatitis.",
+        "answer": "Severe epigastric pain that radiates to the back is most suggestive of **acute pancreatitis**.\n\n**Key points**\n- **Red‑flag features**: severe pain, possible shock (tachycardia, hypotension), diaphoresis, confusion, or signs of peritonitis should prompt urgent evaluation.\n- **Investigations**: obtain serum amylase and lipase (markedly elevated in pancreatitis) and consider contrast‑enhanced abdominal CT or MRI to confirm the diagnosis and assess for complications.\n- **Management**: early supportive care (fluid resuscitation, analgesia, bowel rest) and monitoring for systemic complications.  \n\nIf any of the red‑flag signs are present, treat as an emergency and arrange rapid imaging and laboratory assessment.",
+        "retrieval_time": 0.04023551940917969,
+        "generation_time": 18.17993664741516,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "78587a5a-2f03-4420-9e20-ce2946a37089",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "gastroenterology",
+                "score": 0.5835284452505113
+            },
+            {
+                "chunk_id": "3e57cf6e-a76a-40be-9a2c-e2530f8e9b36",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "gastroenterology",
+                "score": 0.5787430920705844
+            },
+            {
+                "chunk_id": "92f2a42b-9d2e-44ac-889e-d58878bed415",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "gastroenterology",
+                "score": 0.5733780511362386
+            },
+            {
+                "chunk_id": "7e4d5e62-24be-487d-8bd7-9c7e3ee51695",
+                "source_file": "13 Evaluation of the Gastrointestinal Patient - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.530393491864342
+            },
+            {
+                "chunk_id": "af6fecb9-1211-4b4d-b9bf-f8b6b9ea1eb3",
+                "source_file": "19 Appendicitis - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.5232737511859423
+            },
+            {
+                "chunk_id": "985b5e30-7972-459c-9ebb-cefea8826c21",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "gastroenterology",
+                "score": 0.5138326885321081
+            }
+        ]
+    },
+    {
+        "id": 17,
+        "specialty": "gastroenterology",
+        "question": "Right lower quadrant abdominal pain with rebound tenderness suggests which diagnosis?",
+        "ground_truth": "Acute appendicitis.",
+        "answer": "Right lower‑quadrant (RLQ) direct and rebound tenderness—especially at the McBurney point—is most characteristic of **acute appendicitis**.\n\n**Investigations**  \n- CBC (look for leukocytosis)  \n- Abdominal imaging if the diagnosis is uncertain: ultrasound (particularly in children, pregnant patients) or contrast‑enhanced CT abdomen/pelvis.  \n\n**Emergency red flags** to watch for:  \n- Severe, worsening pain or signs of peritonitis (guarding, rigidity)  \n- Fever, tachycardia, hypotension, diaphoresis, or altered mental status (possible perforation or sepsis)  \n\nPrompt surgical evaluation is indicated when these findings are present.",
+        "retrieval_time": 0.03419208526611328,
+        "generation_time": 15.198961734771729,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "4889e76c-ca37-41df-b801-e657037e0839",
+                "source_file": "13 Evaluation of the Gastrointestinal Patient - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "gastroenterology",
+                "score": 0.772515145781027
+            },
+            {
+                "chunk_id": "4967be69-f77c-4877-bd7d-fa2663f864fe",
+                "source_file": "19 Appendicitis - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.6834651558313602
+            },
+            {
+                "chunk_id": "af6fecb9-1211-4b4d-b9bf-f8b6b9ea1eb3",
+                "source_file": "19 Appendicitis - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.6783867134668886
+            },
+            {
+                "chunk_id": "99a50c2a-fc0d-4bc9-9c68-0ca5045e81b0",
+                "source_file": "13 Evaluation of the Gastrointestinal Patient - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "gastroenterology",
+                "score": 0.6669075978064615
+            },
+            {
+                "chunk_id": "78587a5a-2f03-4420-9e20-ce2946a37089",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "gastroenterology",
+                "score": 0.6625690644410228
+            },
+            {
+                "chunk_id": "92f2a42b-9d2e-44ac-889e-d58878bed415",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "gastroenterology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 18,
+        "specialty": "gastroenterology",
+        "question": "Black tarry stools are most consistent with what condition?",
+        "ground_truth": "Upper gastrointestinal bleeding.",
+        "answer": "Black‑tarry stools (melena) are most consistent with **upper gastrointestinal bleeding** (bleeding proximal to the ligament of Treitz).  \n\n**Investigations**  \n- Complete blood count, coagulation profile  \n- Nasogastric tube aspiration (to confirm active upper GI bleed)  \n- Upper endoscopy (esophagogastroduodenoscopy) for localization and therapy  \n\n**Emergency red flags** – tachycardia, hypotension, diaphoresis, syncope, or altered mental status suggesting hemorrhagic shock should prompt immediate resuscitation.",
+        "retrieval_time": 0.039524078369140625,
+        "generation_time": 16.18401527404785,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "78587a5a-2f03-4420-9e20-ce2946a37089",
+                "source_file": "14 Acute Abdominal Pain - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "gastroenterology",
+                "score": 0.49587998552780166
+            },
+            {
+                "chunk_id": "1c04fa06-8045-4b0d-99aa-6ac02418fc6f",
+                "source_file": "18 Overview of Gastrointestinal Bleeding - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "gastroenterology",
+                "score": 0.4956190543886707
+            },
+            {
+                "chunk_id": "4f2f880b-edc7-4a26-b04a-7dc841529422",
+                "source_file": "18 Overview of Gastrointestinal Bleeding - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "gastroenterology",
+                "score": 0.49479107954967416
+            },
+            {
+                "chunk_id": "d3e9a7ed-9668-4937-86ad-5f5a942aa902",
+                "source_file": "18 Overview of Gastrointestinal Bleeding - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "gastroenterology",
+                "score": 0.48247412668769896
+            },
+            {
+                "chunk_id": "5a056e18-c0f4-44bf-af58-82b9cff8c079",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "gastroenterology",
+                "score": null
+            },
+            {
+                "chunk_id": "addff175-a7e7-4835-9f61-03cbd02c7a3b",
+                "source_file": "13 Evaluation of the Gastrointestinal Patient - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 12,
+                "specialty": "gastroenterology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 19,
+        "specialty": "gastroenterology",
+        "question": "Helicobacter pylori is commonly associated with which gastrointestinal disease?",
+        "ground_truth": "Peptic ulcer disease.",
+        "answer": "Helicobacter pylori infection is most commonly linked to **peptic ulcer disease** (gastric and duodenal ulcers).  \n\n**Relevant investigations**  \n- Upper endoscopy with visualisation of the ulcer  \n- H. pylori testing (urea breath test, stool antigen, rapid urease test, or histology on biopsy)  \n\n**Emergency red‑flags** to watch for include sudden severe abdominal pain, hematemesis, melena, or signs of perforation, which require urgent evaluation.",
+        "retrieval_time": 0.04751944541931152,
+        "generation_time": 14.122928857803345,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "5bd75e9b-9119-4bad-bc2e-fa6971a26240",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "gastroenterology",
+                "score": 0.6258861122976569
+            },
+            {
+                "chunk_id": "482f35f1-ce83-440c-b5bf-1c516bb958d6",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "gastroenterology",
+                "score": 0.617557389269722
+            },
+            {
+                "chunk_id": "41ba8156-e9d3-47d6-b8eb-3558f5608207",
+                "source_file": "16 Peptic Ulcer Disease - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 10,
+                "specialty": "gastroenterology",
+                "score": 0.5943165211827538
+            },
+            {
+                "chunk_id": "a96dda4b-a463-413e-98ab-9ceaaa5ca96d",
+                "source_file": "18 Overview of Gastrointestinal Bleeding - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": 0.5905610262461906
+            },
+            {
+                "chunk_id": "c6e7d9d9-caba-4f86-ac82-fa86cdb7ccfe",
+                "source_file": "17 Acute Pancreatitis - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "gastroenterology",
+                "score": null
+            },
+            {
+                "chunk_id": "644b019d-adca-4d00-83aa-4141ac37dd6d",
+                "source_file": "15 Gastroesophageal Reflux Disease (GERD) - Gastroenterology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "gastroenterology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 20,
+        "specialty": "endocrinology",
+        "question": "Polyuria, polydipsia and elevated blood glucose suggest which disease?",
+        "ground_truth": "Diabetes mellitus.",
+        "answer": "The triad of polyuria, polydipsia and an elevated plasma glucose is characteristic of **diabetes mellitus** (most often type 2 diabetes mellitus).  \n\n**Suggested investigations**  \n- Fasting plasma glucose (≥126 mg/dL diagnostic)  \n- Hemoglobin A1c (≥6.5 %)  \n- 2‑hour oral glucose tolerance test (≥200 mg/dL)  \n\n**Emergency red flags** to watch for include severe dehydration, orthostatic hypotension, altered mental status, or signs of diabetic ketoacidosis/hyperosmolar hyperglycemic state, which require urgent evaluation and treatment.",
+        "retrieval_time": 0.0687110424041748,
+        "generation_time": 4.130026340484619,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "a5edd9ea-5531-4d2c-a83f-2177fe07f555",
+                "source_file": "Diabetes_Mellitus_Complete.pdf",
+                "page": 4,
+                "specialty": "endocrinology",
+                "score": 0.712074183719464
+            },
+            {
+                "chunk_id": "bf187345-e99b-4c6e-8b72-fecc83e7ced8",
+                "source_file": "Diabetes_Mellitus_Complete.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": 0.6043762152790311
+            },
+            {
+                "chunk_id": "31c0c619-3800-4c30-b548-85503592d3fe",
+                "source_file": "Diabetes_Mellitus_Complete.pdf",
+                "page": 23,
+                "specialty": "endocrinology",
+                "score": 0.5632718269192054
+            },
+            {
+                "chunk_id": "38cc687b-fd1d-4b02-9e9c-9e8e28dc7a18",
+                "source_file": "Diabetes_Mellitus_Complete.pdf",
+                "page": 14,
+                "specialty": "endocrinology",
+                "score": null
+            },
+            {
+                "chunk_id": "1745e812-0402-4079-85c7-2c826e021130",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "endocrinology",
+                "score": null
+            },
+            {
+                "chunk_id": "3777f8d7-f1bf-49b9-bad9-c48cf890049f",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 21,
+        "specialty": "endocrinology",
+        "question": "Confusion with very low blood glucose levels indicates what acute complication?",
+        "ground_truth": "Hypoglycemia.",
+        "answer": "Confusion that occurs when plasma glucose falls to very low levels is a manifestation of **neuroglycopenia** – the acute central‑nervous‑system complication of severe hypoglycaemia.  \n\n**Key points**\n\n* **Investigation** – Obtain an immediate capillary or plasma glucose measurement (goal < 55 mg/dL ≈ 3 mmol/L). If hypoglycaemia is confirmed, consider serum insulin, C‑peptide, sulfonylurea and proinsulin levels to identify the aetiology (Whipple’s triad).  \n* **Emergency red flags** – Rapidly worsening confusion, seizures, or loss of consciousness signals impending coma; treat urgently with IV dextrose (e.g., 50 mL of 50 % dextrose) and address the underlying cause.  \n\nThus, confusion with very low blood glucose indicates the acute complication of **neuroglycopenia**.",
+        "retrieval_time": 0.04979419708251953,
+        "generation_time": 18.205464363098145,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "3777f8d7-f1bf-49b9-bad9-c48cf890049f",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": 0.7112835299148239
+            },
+            {
+                "chunk_id": "ca0f6497-653a-4259-93cc-25d3cb8274f7",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "endocrinology",
+                "score": 0.7091648710604541
+            },
+            {
+                "chunk_id": "d8120600-9b24-40ce-af1f-9ee6b9be06aa",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "endocrinology",
+                "score": 0.6917637860094583
+            },
+            {
+                "chunk_id": "8c980c02-642c-47f3-a83d-794f226cad1a",
+                "source_file": "Diabetes_Mellitus_Complete.pdf",
+                "page": 23,
+                "specialty": "endocrinology",
+                "score": 0.6896874425909933
+            },
+            {
+                "chunk_id": "46d1acf2-dbb8-44a5-abc4-37f0efac9337",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "endocrinology",
+                "score": 0.6861418178865901
+            },
+            {
+                "chunk_id": "e76b1a98-f500-47ef-8034-8cdcc3ef1feb",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "endocrinology",
+                "score": 0.683372327397515
+            }
+        ]
+    },
+    {
+        "id": 22,
+        "specialty": "endocrinology",
+        "question": "Weight gain, cold intolerance and fatigue suggest which endocrine disorder?",
+        "ground_truth": "Hypothyroidism.",
+        "answer": "The triad of modest weight gain, cold intolerance and fatigue is characteristic of **primary hypothyroidism**.  \n\n**Suggested investigations**  \n- Serum thyroid‑stimulating hormone (TSH) – typically elevated.  \n- Free thyroxine (free T4) – typically low.  \n- If indicated, thyroid antibodies (anti‑TPO, anti‑TG) to assess autoimmune etiology.  \n\n**Emergency red flag**  \n- Signs of myxedema crisis (altered mental status, hypothermia, severe bradycardia, hypotension) require immediate evaluation and treatment.",
+        "retrieval_time": 0.04426383972167969,
+        "generation_time": 16.846813440322876,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "d7a11ae4-3676-4480-8b3d-ea296edf09ba",
+                "source_file": "22 Hypothyroidism - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "endocrinology",
+                "score": 0.6718880487481453
+            },
+            {
+                "chunk_id": "a573c5ac-0750-476d-9703-64829d9b32f9",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "endocrinology",
+                "score": 0.6167783047749982
+            },
+            {
+                "chunk_id": "939f9b82-6dbd-4a6f-862b-4a99194c330d",
+                "source_file": "24 Hyperthyroidism - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": 0.61627671513087
+            },
+            {
+                "chunk_id": "bbdfdff4-2c86-4663-869e-6921bbefa3f0",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "endocrinology",
+                "score": 0.6122807724235522
+            },
+            {
+                "chunk_id": "1745e812-0402-4079-85c7-2c826e021130",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "endocrinology",
+                "score": null
+            },
+            {
+                "chunk_id": "b44f88e5-651b-481e-ab18-b5118b470ae8",
+                "source_file": "23 Hypoglycemia - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 23,
+        "specialty": "endocrinology",
+        "question": "Weight loss, heat intolerance and tremors suggest which endocrine disorder?",
+        "ground_truth": "Hyperthyroidism.",
+        "answer": "The triad of weight loss, heat intolerance and tremor is characteristic of **hyper‑thyroidism (thyrotoxicosis)**.  \n\n**Suggested investigations**  \n- Serum thyroid‑stimulating hormone (TSH)  \n- Free T4 and free T3 levels (thyroid function tests)  \n- Consider radioactive iodine uptake scan if the etiology is unclear.  \n\n**Emergency red flags** to watch for include new‑onset atrial fibrillation, marked tachycardia, high‑grade fever, altered mental status or signs of thyroid storm; these require urgent evaluation.",
+        "retrieval_time": 0.048959970474243164,
+        "generation_time": 15.088853120803833,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "939f9b82-6dbd-4a6f-862b-4a99194c330d",
+                "source_file": "24 Hyperthyroidism - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "endocrinology",
+                "score": 0.6495722618391426
+            },
+            {
+                "chunk_id": "d7a11ae4-3676-4480-8b3d-ea296edf09ba",
+                "source_file": "22 Hypothyroidism - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "endocrinology",
+                "score": 0.634142848508335
+            },
+            {
+                "chunk_id": "bbdfdff4-2c86-4663-869e-6921bbefa3f0",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "endocrinology",
+                "score": 0.602416850438608
+            },
+            {
+                "chunk_id": "1745e812-0402-4079-85c7-2c826e021130",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "endocrinology",
+                "score": null
+            },
+            {
+                "chunk_id": "2b236989-d608-4730-a4cd-321794c7a261",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "endocrinology",
+                "score": null
+            },
+            {
+                "chunk_id": "efe726ce-f6db-4842-81bf-c0d114d9c10d",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "endocrinology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 24,
+        "specialty": "endocrinology",
+        "question": "Moon face, truncal obesity and purple striae are characteristic of which syndrome?",
+        "ground_truth": "Cushing syndrome.",
+        "answer": "The described findings—moon‑face, central (truncal) obesity, and violaceous (purple) abdominal striae—are classic features of **Cushing syndrome** (glucocorticoid excess).  \n\n**Relevant investigations** to confirm the diagnosis include:  \n- 24‑hour urinary free cortisol measurement  \n- Low‑dose dexamethasone suppression test (and, if positive, high‑dose test or ACTH measurement to differentiate Cushing disease from ectopic/ adrenal sources).",
+        "retrieval_time": 0.051732540130615234,
+        "generation_time": 18.919745922088623,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "fdd0bef4-9235-49d3-8da8-9a8a24a2b4d0",
+                "source_file": "26 Cushing Syndrome - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "endocrinology",
+                "score": 0.5790462964987717
+            },
+            {
+                "chunk_id": "3ad13dfd-6c2f-4cee-ba09-14e850acae08",
+                "source_file": "26 Cushing Syndrome - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "endocrinology",
+                "score": 0.549982714849478
+            },
+            {
+                "chunk_id": "699bf3bd-348f-46c1-b68f-7ec0de2114c6",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "endocrinology",
+                "score": 0.503817965123192
+            },
+            {
+                "chunk_id": "ab1c4791-d894-47c0-b7b6-1105bac2d3c1",
+                "source_file": "24 Hyperthyroidism - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "endocrinology",
+                "score": 0.5014984976090919
+            },
+            {
+                "chunk_id": "bbdfdff4-2c86-4663-869e-6921bbefa3f0",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "endocrinology",
+                "score": 0.496227992055956
+            },
+            {
+                "chunk_id": "905d3212-8dc2-49f9-be11-6ba2f5904191",
+                "source_file": "25 Obesity - Endocrinology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "endocrinology",
+                "score": 0.46645368810022303
+            }
+        ]
+    },
+    {
+        "id": 25,
+        "specialty": "neurology",
+        "question": "Sudden unilateral weakness and slurred speech suggest what diagnosis?",
+        "ground_truth": "Acute ischemic stroke.",
+        "answer": "The presentation is most consistent with an **acute cerebrovascular accident (stroke)**, most often an anterior‑circulation (e.g., middle‑cerebral‑artery) ischemic stroke that produces contralateral hemiparesis (especially of the arm/face) and dysarthria (slurred speech).\n\n**Key investigations**\n- Emergent non‑contrast head CT (or MRI if available) to differentiate hemorrhagic from ischemic stroke and to assess for early infarction.\n- Vascular imaging (CT‑angiography, MR‑angiography, or carotid duplex) to identify arterial occlusion or stenosis.\n- Basic labs (CBC, electrolytes, coagulation profile, glucose) and cardiac monitoring for potential embolic sources.\n\n**Emergency red flags**\n- Sudden onset of focal neurological deficit.\n- Possible progression of deficits or loss of consciousness.\n- Need for immediate neuro‑imaging and possible reperfusion therapy (thrombolysis or thrombectomy) within therapeutic windows.",
+        "retrieval_time": 0.09423184394836426,
+        "generation_time": 13.363039493560791,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "6dfcff8d-f090-4e52-98e3-82a202fed460",
+                "source_file": "35 Parkinson Disease - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "neurology",
+                "score": 0.5673888996691436
+            },
+            {
+                "chunk_id": "3274e026-2868-44ca-a603-3fbbd618c9cc",
+                "source_file": "33 Dementia - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "neurology",
+                "score": 0.5495680320069793
+            },
+            {
+                "chunk_id": "f9c2d7d3-fd41-46bc-b711-75d60ff81ff0",
+                "source_file": "27 Overview of Stroke - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "neurology",
+                "score": 0.5405055323464698
+            },
+            {
+                "chunk_id": "8d2c3372-06d5-4e39-882d-650aaf45afc8",
+                "source_file": "28 Ischemic Stroke - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "neurology",
+                "score": null
+            },
+            {
+                "chunk_id": "f17071a2-eb0b-4cee-9490-874aaefa8cc7",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 15,
+                "specialty": "neurology",
+                "score": null
+            },
+            {
+                "chunk_id": "d8af817b-f42e-4d2f-ae40-07849e880dc9",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "neurology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 26,
+        "specialty": "neurology",
+        "question": "A patient experiences recurrent generalized tonic-clonic episodes. What condition is likely?",
+        "ground_truth": "Seizure disorder.",
+        "answer": "The presentation is most consistent with **epilepsy – a chronic seizure disorder characterized by recurrent generalized‑onset tonic‑clonic seizures**.\n\n**Suggested investigations**\n- Electroencephalography (EEG) to identify generalized epileptiform discharges.  \n- Brain MRI (or CT if MRI unavailable) to exclude structural lesions that may be provoking the seizures.\n\n**Emergency red‑flags**\n- Seizure lasting > 5 minutes (possible status epilepticus).  \n- Prolonged post‑ictal confusion or respiratory compromise.  \n\nIf these are present, urgent emergency evaluation is required.",
+        "retrieval_time": 0.0524744987487793,
+        "generation_time": 18.165053844451904,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "8a8cfe77-22a3-4d74-b732-1401c41674d5",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 12,
+                "specialty": "neurology",
+                "score": 0.6980819357760293
+            },
+            {
+                "chunk_id": "f17071a2-eb0b-4cee-9490-874aaefa8cc7",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 15,
+                "specialty": "neurology",
+                "score": 0.6967381045846838
+            },
+            {
+                "chunk_id": "22f7f98a-64d3-4fda-8526-1f34a6615a9e",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "neurology",
+                "score": 0.6773845457029966
+            },
+            {
+                "chunk_id": "c2860f23-8254-4145-a949-7679e4ca6b33",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "neurology",
+                "score": 0.6560600105241217
+            },
+            {
+                "chunk_id": "8f8951c0-7425-42ed-8ed2-a5af1f8aaec5",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 10,
+                "specialty": "neurology",
+                "score": 0.6403560526221139
+            },
+            {
+                "chunk_id": "77723b81-76a1-4c27-87b1-aa71194c7da3",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "neurology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 27,
+        "specialty": "neurology",
+        "question": "Severe unilateral throbbing headache with photophobia suggests which condition?",
+        "ground_truth": "Migraine.",
+        "answer": "The presentation is most consistent with **migraine** – a primary headache disorder characterized by severe unilateral, pulsating/throbbing pain that is worsened by routine activity and accompanied by photophobia (often with nausea, phonophobia, or osmophobia).\n\n**Investigations** – In a patient with classic migraine features and no red‑flag findings, imaging or laboratory studies are not required. If any red‑flag signs are present (e.g., thunderclap onset, new headache after age 50, progressive worsening, fever, meningismus, focal neurologic deficit, papilledema, or a change in pattern), neuroimaging (MRI brain with/without contrast) and possibly lumbar puncture should be pursued.\n\n**Emergency red flags** to watch for:\n- Sudden “thunderclap” headache\n- Onset after age 50\n- Progressive increase in intensity or frequency\n- Associated fever, neck stiffness, altered mental status\n- Persistent focal neurologic deficits or papilledema\n- History of cancer, immunosuppression, or recent trauma\n\nIf none of these are present, the diagnosis of migraine can be made clinically.",
+        "retrieval_time": 0.05658888816833496,
+        "generation_time": 15.306885004043579,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "704fd368-b62a-480d-9e38-9a80151cad5f",
+                "source_file": "31 Migraine - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "neurology",
+                "score": 0.6855619826182014
+            },
+            {
+                "chunk_id": "784eb183-5cbc-4a4e-a532-fb4bf156c17c",
+                "source_file": "31 Migraine - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "neurology",
+                "score": 0.6215096256951341
+            },
+            {
+                "chunk_id": "8f3ff57b-9ab8-44a4-8355-4878de393986",
+                "source_file": "31 Migraine - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "neurology",
+                "score": 0.6032567106888846
+            },
+            {
+                "chunk_id": "0cc2be88-5943-4121-ae72-7e84ccb88a8f",
+                "source_file": "31 Migraine - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "neurology",
+                "score": 0.5925807032268327
+            },
+            {
+                "chunk_id": "9589b4ef-5239-434d-973a-a11244d1ac3b",
+                "source_file": "31 Migraine - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "neurology",
+                "score": 0.5774932694248424
+            },
+            {
+                "chunk_id": "8f8951c0-7425-42ed-8ed2-a5af1f8aaec5",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 10,
+                "specialty": "neurology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 28,
+        "specialty": "neurology",
+        "question": "Acute fever, neck stiffness and altered mental status suggest which neurological emergency?",
+        "ground_truth": "Acute bacterial meningitis.",
+        "answer": "Acute fever, neck stiffness (nuchal rigidity) and altered mental status are classic red‑flag findings for **acute bacterial meningitis**, a neurologic emergency that requires immediate evaluation and treatment.  \n\n**Key investigations** (do not delay antimicrobial therapy):\n- Prompt blood cultures and a complete blood count.  \n- Lumbar puncture for cerebrospinal fluid (CSF) analysis (cell count, glucose, protein, Gram stain, culture).  \n- Head CT (or MRI) before lumbar puncture if there are signs of increased intracranial pressure, focal neurologic deficit, or seizures.  \n- Additional studies as indicated: serum electrolytes, glucose, renal function, and a urine drug screen.\n\n**Emergency red flags**: fever, nuchal rigidity, and any change in consciousness should trigger urgent work‑up for meningitis and empiric intravenous antibiotics (and corticosteroids after cultures) without waiting for imaging results.",
+        "retrieval_time": 0.039377689361572266,
+        "generation_time": 16.25789737701416,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "4f5a5ce7-be71-4cda-be20-88c5b201f0d2",
+                "source_file": "27 Overview of Stroke - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "neurology",
+                "score": 0.6491127136764041
+            },
+            {
+                "chunk_id": "79b4f798-2973-4c41-919a-3b17cd199714",
+                "source_file": "32 Delirium - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "neurology",
+                "score": 0.6151846902859528
+            },
+            {
+                "chunk_id": "c14a8187-4b98-4b0c-b527-fbc97fc37792",
+                "source_file": "36 Acute Bacterial Meningitis - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "neurology",
+                "score": 0.5921156127535149
+            },
+            {
+                "chunk_id": "34809a89-3d3e-4fe6-ac46-034f9454dc32",
+                "source_file": "34 Dementia with Lewy Bodies and Parkinson Disease Dementia - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "neurology",
+                "score": 0.5659148557893237
+            },
+            {
+                "chunk_id": "7f70b81c-1329-43a0-94ab-97559a7ed160",
+                "source_file": "36 Acute Bacterial Meningitis - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "neurology",
+                "score": null
+            },
+            {
+                "chunk_id": "a3e72346-40de-413a-9ff6-274b1356ed44",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "neurology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 29,
+        "specialty": "neurology",
+        "question": "Resting tremor, rigidity and bradykinesia are classic features of which disease?",
+        "ground_truth": "Parkinson disease.",
+        "answer": "The classic triad of resting tremor, rigidity, and bradykinesia is characteristic of **Parkinson disease (Parkinson’s disease)**.",
+        "retrieval_time": 0.05642437934875488,
+        "generation_time": 16.806281566619873,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "e86c0a7d-ad96-42dc-8592-ab9e5f5bbdfc",
+                "source_file": "35 Parkinson Disease - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "neurology",
+                "score": 0.6937960227509565
+            },
+            {
+                "chunk_id": "43089188-0dc6-4839-8aca-302139cabf25",
+                "source_file": "35 Parkinson Disease - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "neurology",
+                "score": 0.6406473716390213
+            },
+            {
+                "chunk_id": "6dfcff8d-f090-4e52-98e3-82a202fed460",
+                "source_file": "35 Parkinson Disease - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "neurology",
+                "score": 0.6085246874311098
+            },
+            {
+                "chunk_id": "d33f1690-9f67-4472-a262-9b6cf169ccaf",
+                "source_file": "33 Dementia - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "neurology",
+                "score": 0.5807624740232868
+            },
+            {
+                "chunk_id": "6d72a06d-008e-4876-b255-098a48f5ae4b",
+                "source_file": "35 Parkinson Disease - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 14,
+                "specialty": "neurology",
+                "score": null
+            },
+            {
+                "chunk_id": "d8af817b-f42e-4d2f-ae40-07849e880dc9",
+                "source_file": "30 Seizure Disorders - Neurology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "neurology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 30,
+        "specialty": "dermatology",
+        "question": "Chronic itchy flexural rash is characteristic of which skin condition?",
+        "ground_truth": "Atopic dermatitis.",
+        "answer": "Chronic pruritic rash in the flexural areas (antecubital and popliteal fossae, wrists, ankles) is characteristic of **atopic dermatitis – specifically flexural (or “eczema”) dermatitis**.  \n\n**Investigations** – Diagnosis is clinical; consider skin‑type assessment, evaluation for Staphylococcus aureus colonisation, and, if contact allergy is suspected, patch testing.  \n\n**Red‑flag signs** – Rapid spread, fever, systemic symptoms, or development of vesiculobullous lesions should prompt evaluation for secondary infection or alternative dermatoses.",
+        "retrieval_time": 0.06302261352539062,
+        "generation_time": 14.202523469924927,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "03270d6e-d3a8-4146-acc1-32a0ca42c0be",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "dermatology",
+                "score": 0.5934496448025817
+            },
+            {
+                "chunk_id": "bfb745ea-3c74-4620-99ad-0b4ebe4e0214",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "dermatology",
+                "score": 0.5844189660126979
+            },
+            {
+                "chunk_id": "3d1e605f-f9e7-4f80-a12a-ac4cafe601f1",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 8,
+                "specialty": "dermatology",
+                "score": 0.5498882216151166
+            },
+            {
+                "chunk_id": "cf34714d-93b4-4b30-8837-13a2288872a1",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "dermatology",
+                "score": null
+            },
+            {
+                "chunk_id": "76f47107-9cbf-4a1b-a4e1-c9dcf3bfed7f",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "dermatology",
+                "score": null
+            },
+            {
+                "chunk_id": "f1825892-9807-4f36-b0d7-fce08c53beb9",
+                "source_file": "40 Skin Manifestations of Internal Disease - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "dermatology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 31,
+        "specialty": "dermatology",
+        "question": "Pruritic rash appearing after exposure to an allergen suggests what diagnosis?",
+        "ground_truth": "Contact dermatitis.",
+        "answer": "A pruritic rash that develops after contact with an allergen is most suggestive of **allergic contact dermatitis (ACD)**.  \n\n**Investigations** – Patch testing of the suspected allergen(s) is the standard diagnostic tool to confirm ACD.  \n\n**Red‑flag considerations** – If the rash is rapidly spreading, associated with systemic symptoms (fever, malaise) or signs of infection (purulent discharge, extensive crusting), urgent evaluation is warranted.",
+        "retrieval_time": 0.04082369804382324,
+        "generation_time": 16.96044921875,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "bf9742bc-0070-4733-8592-32d83cda5025",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "dermatology",
+                "score": 0.6464464408193322
+            },
+            {
+                "chunk_id": "3dbf5647-3629-4405-af15-887d32f92872",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 7,
+                "specialty": "dermatology",
+                "score": 0.6374358239293396
+            },
+            {
+                "chunk_id": "bfb745ea-3c74-4620-99ad-0b4ebe4e0214",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "dermatology",
+                "score": 0.6311414028384802
+            },
+            {
+                "chunk_id": "e39e0270-e903-43de-8333-ef660e693e3c",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 13,
+                "specialty": "dermatology",
+                "score": 0.6091129309957763
+            },
+            {
+                "chunk_id": "017629da-1b2e-4691-9164-0dabaa7cfe03",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "dermatology",
+                "score": null
+            },
+            {
+                "chunk_id": "b1621ded-92b5-4292-a26e-7c44eb8435fa",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "dermatology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 32,
+        "specialty": "dermatology",
+        "question": "Painful warm erythematous skin with fever suggests which skin infection?",
+        "ground_truth": "Cellulitis.",
+        "answer": "The presentation of a painful, warm, erythematous area of skin accompanied by fever is most characteristic of **cellulitis**, a bacterial infection of the dermis and subcutaneous tissue (often caused by Staphylococcus aureus or Streptococcus pyogenes).  \n\n**Suggested investigations**  \n- CBC with differential (look for leukocytosis)  \n- Blood cultures if systemic signs are present  \n- Wound or skin swab culture for pathogen identification  \n- Consider bedside ultrasound or MRI if deep tissue involvement or an abscess is suspected  \n\n**Emergency red‑flags**  \n- Rapid expansion of erythema, severe pain out of proportion, or bullae → consider necrotizing fasciitis  \n- Hypotension, tachycardia, altered mental status → systemic sepsis  \n\nPrompt antimicrobial therapy and close monitoring are indicated.",
+        "retrieval_time": 0.0859978199005127,
+        "generation_time": 16.163036823272705,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "e0dfe090-f54f-4355-ae0e-befeebc7d801",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "dermatology",
+                "score": 0.6266085092811335
+            },
+            {
+                "chunk_id": "142c9c2a-9263-4ce5-abec-bb0097263dfd",
+                "source_file": "39 Contact Dermatitis - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "dermatology",
+                "score": 0.6247074335322012
+            },
+            {
+                "chunk_id": "c0759afe-4f73-4509-9e4d-979b8ebcc58e",
+                "source_file": "40 Skin Manifestations of Internal Disease - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "dermatology",
+                "score": 0.5888404233025819
+            },
+            {
+                "chunk_id": "d682be0f-4f7a-4df5-9e5c-8bfe82b4087f",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "dermatology",
+                "score": 0.5863928715158572
+            },
+            {
+                "chunk_id": "dfc96b96-8a0d-48ef-a837-ceabc46c044b",
+                "source_file": "38 Atopic Dermatitis (Eczema) - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "dermatology",
+                "score": null
+            },
+            {
+                "chunk_id": "780898ea-dc5b-44d3-ada0-697201db4421",
+                "source_file": "40 Skin Manifestations of Internal Disease - Dermatology - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "dermatology",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 33,
+        "specialty": "critical_care",
+        "question": "Persistent hypotension despite adequate fluid resuscitation in a patient with infection indicates what condition?",
+        "ground_truth": "Septic shock.",
+        "answer": "Persistent hypotension despite adequate fluid resuscitation in a patient with infection is diagnostic of **septic shock** – sepsis with ongoing hypotension that requires vasopressor support to keep MAP ≥ 65 mm Hg (often accompanied by a lactate > 2 mmol/L).  \n\n**Relevant investigations**  \n- Serial blood pressure and MAP monitoring (invasive arterial line if unstable)  \n- Serum lactate level  \n- Full sepsis work‑up: blood, urine, and site‑specific cultures; CBC, comprehensive metabolic panel  \n\n**Emergency red flags**  \n- Ongoing hypotension (SBP < 90 mm Hg or MAP < 65 mm Hg) despite fluids  \n- Rising lactate or evidence of organ dysfunction (oliguria, altered mental status, hypoxia)  \n\nPrompt initiation of vasopressors, source control, and continued supportive care is required.",
+        "retrieval_time": 0.06338167190551758,
+        "generation_time": 18.161736726760864,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "aecda88a-1e47-4cf0-abbc-d1bacc2aec7d",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "critical_care",
+                "score": 0.6587555965143328
+            },
+            {
+                "chunk_id": "371ea506-e771-45f4-80d0-b74deff724c7",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "critical_care",
+                "score": 0.6552940969195573
+            },
+            {
+                "chunk_id": "cf117c59-026f-48eb-87bb-a177616d61b6",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "critical_care",
+                "score": 0.6411378766619911
+            },
+            {
+                "chunk_id": "afad36ba-daa4-4e63-91ac-524bd2a8b4df",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "critical_care",
+                "score": 0.6225324454147965
+            },
+            {
+                "chunk_id": "35631b62-28a1-4310-bc41-fb00bd9cc9fa",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 10,
+                "specialty": "critical_care",
+                "score": 0.6110030907109444
+            },
+            {
+                "chunk_id": "8c1a36ee-bf05-4fb1-8cf4-b15e539a89fa",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "critical_care",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 34,
+        "specialty": "critical_care",
+        "question": "Low blood pressure with signs of inadequate tissue perfusion defines what syndrome?",
+        "ground_truth": "Shock.",
+        "answer": "The described picture—hypotension together with clinical evidence of inadequate tissue perfusion—defines **shock**.  \n\n**Relevant investigations** often include:  \n- Serial blood pressure measurements (invasive arterial line if unstable)  \n- Urine output monitoring (< 0.5 mL/kg/h suggests hypoperfusion)  \n- Serum lactate and base deficit (elevated lactate > 2 mmol/L indicates anaerobic metabolism)  \n- CBC, metabolic panel, and cultures to identify underlying cause  \n\n**Emergency red flags**: persistent hypotension, altered mental status, oliguria, cool/clammy skin, rising lactate—these require immediate resuscitation and treatment of the underlying etiology.",
+        "retrieval_time": 0.050847768783569336,
+        "generation_time": 18.049416065216064,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "2f18566a-6b51-4791-8fd9-3b70605096d2",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "critical_care",
+                "score": 0.6244738556977538
+            },
+            {
+                "chunk_id": "fa781725-4035-4b2f-b5a5-3191f4001ecf",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 2,
+                "specialty": "critical_care",
+                "score": 0.6192887396597011
+            },
+            {
+                "chunk_id": "8c1a36ee-bf05-4fb1-8cf4-b15e539a89fa",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 9,
+                "specialty": "critical_care",
+                "score": 0.5964341474393351
+            },
+            {
+                "chunk_id": "712218cd-60d2-4e47-81cd-aa7b9a496f27",
+                "source_file": "42 Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 10,
+                "specialty": "critical_care",
+                "score": null
+            },
+            {
+                "chunk_id": "ed18cdc7-d082-42de-beea-8cf93b1b6a47",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "critical_care",
+                "score": null
+            },
+            {
+                "chunk_id": "aecda88a-1e47-4cf0-abbc-d1bacc2aec7d",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "critical_care",
+                "score": null
+            }
+        ]
+    },
+    {
+        "id": 35,
+        "specialty": "critical_care",
+        "question": "Diffuse pulmonary infiltrates with severe hypoxemia are characteristic of which syndrome?",
+        "ground_truth": "Acute respiratory distress syndrome.",
+        "answer": "Diffuse pulmonary infiltrates together with severe hypoxemia are characteristic of **acute respiratory distress syndrome (ARDS)**.\n\n**Key investigations**\n- **Chest radiograph or CT** – shows bilateral, diffuse infiltrates without cardiogenic edema.\n- **Arterial blood gas** – PaO₂ < 60 mm Hg (or PaO₂/FiO₂ < 300) confirming severe hypoxemia.\n\n**Emergency red‑flag signs**\n- PaO₂ < 60 mm Hg or SpO₂ < 88 % despite supplemental oxygen.\n- Rapidly worsening dyspnea, tachypnea, or altered mental status.",
+        "retrieval_time": 0.04763197898864746,
+        "generation_time": 19.056228160858154,
+        "retrieved_chunks": [
+            {
+                "chunk_id": "6d86c4e1-7cd7-4c25-9b3a-64c673d900c0",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 1,
+                "specialty": "critical_care",
+                "score": 0.6127893584445331
+            },
+            {
+                "chunk_id": "94b6c29c-f850-4822-a999-9cae1385bbcc",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 0,
+                "specialty": "critical_care",
+                "score": 0.6036824781525416
+            },
+            {
+                "chunk_id": "d4d6621e-ce60-4d39-86aa-7c655ef84852",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 3,
+                "specialty": "critical_care",
+                "score": 0.5798910457834756
+            },
+            {
+                "chunk_id": "c2c8e7c9-d950-4f57-b333-de591f727138",
+                "source_file": "41 Sepsis and Septic Shock - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 6,
+                "specialty": "critical_care",
+                "score": 0.5697486174235715
+            },
+            {
+                "chunk_id": "8ed6f315-4fdf-4089-965d-1d4b2d7fb335",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 5,
+                "specialty": "critical_care",
+                "score": 0.5566191154691549
+            },
+            {
+                "chunk_id": "e8b896b7-1e7a-41f8-960e-83e83ac5cc86",
+                "source_file": "44 Acute Hypoxemic Respiratory Failure (AHRF), Including Acute Respiratory Distress Syndrome (ARDS) - Critical Care Medicine - Merck Manual Professional Edition.pdf",
+                "page": 4,
+                "specialty": "critical_care",
+                "score": null
+            }
+        ]
+    }
+]
