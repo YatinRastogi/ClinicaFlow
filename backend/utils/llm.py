@@ -112,15 +112,28 @@ def get_llm_metrics() -> dict:
     with _metrics_lock:
         return json.loads(json.dumps(_metrics))
 
-
 def clear_llm_cache():
     with _cache_lock:
         _cache.clear()
 
 
+def compact_json_for_prompt(obj, max_chars: int = 800) -> str:
+    """Return a compact, minified JSON string representation suitable for embedding in prompts.
+    If it exceeds max_chars, truncate preserving start and end with an ellipsis.
+    """
+    try:
+        s = json.dumps(obj, separators=(',', ':'), ensure_ascii=False)
+    except Exception:
+        s = str(obj)
+    if len(s) <= max_chars:
+        return s
+    head = s[: max_chars//2]
+    tail = s[- (max_chars//2 - 3):]
+    return head + '...' + tail
+
+
 # Monkey-patch ChatGroq instances' invoke methods so existing call sites don't need edits.
 # The wrapper provides optional caching (default on) and token accounting.
-
 def _wrap_invoke(instance, model_name: str):
     original_invoke = getattr(instance, "invoke")
 
@@ -171,6 +184,32 @@ _wrap_invoke(lab_report_llm, "lab_report_llm")
 _wrap_invoke(llm, "llm")
 _wrap_invoke(triage_llm, "triage_llm")
 _wrap_invoke(small_llm, "small_llm")
+
+
+def recommend_model_for_task(task_type: str):
+    """Return a suitable LLM instance for a high-level task type.
+    Task types: 'triage', 'lab_summary', 'short_form', 'analysis'
+    """
+    t = task_type.lower()
+    if t in ("triage", "routing", "classification"):
+        return triage_llm
+    if t in ("lab_summary", "summarize"):
+        return lab_report_llm
+    if t in ("short_form", "questions", "batch_questions"):
+        return small_llm
+    # default to powerful analysis model
+    return llm
+
+
+def set_model_temperature(model_instance, temperature: float):
+    """Adjust an LLM instance's temperature parameter to trade off creativity vs determinism.
+    Returns True on success.
+    """
+    try:
+        setattr(model_instance, 'temperature', float(temperature))
+        return True
+    except Exception:
+        return False
 
 
 # Convenience helpers for reducing conversation history size

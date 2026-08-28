@@ -22,6 +22,9 @@ from sentence_transformers import SentenceTransformer
 # _EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 _EMBED_MODEL = SentenceTransformer("BAAI/bge-small-en-v1.5")
 
+# Simple in-memory embedding cache to avoid recomputing embeddings for identical texts
+_embed_cache = {}
+
 # Cosine similarity threshold above which two questions are "the same"
 DEDUP_THRESHOLD: float = 0.70
 
@@ -65,9 +68,20 @@ def make_interview_state() -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def embed_text(text: str) -> List[float]:
-    """Return a unit-norm embedding for *text* as a plain Python list."""
+    """Return a unit-norm embedding for *text* as a plain Python list.
+    Uses an in-memory cache to avoid repeated expensive calls for the same text.
+    """
+    if text in _embed_cache:
+        return _embed_cache[text]
     vec = _EMBED_MODEL.encode(text, normalize_embeddings=True)
-    return vec.tolist()
+    arr = vec.tolist()
+    _embed_cache[text] = arr
+    return arr
+
+
+def clear_embedding_cache():
+    """Clear the in-memory embedding cache."""
+    _embed_cache.clear()
 
 
 def cosine_similarity(a: List[float], b: List[float]) -> float:

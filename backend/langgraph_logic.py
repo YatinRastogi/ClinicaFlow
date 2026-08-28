@@ -244,11 +244,52 @@ def process_all_lab_reports_node(state: PatientState) -> Dict[str, Any]:
         lab_results = {"_status": "not_provided",
                        "_note": "Patient did not upload any lab reports or health records."}
     else:
-        for report_name, file_path in files.items():
+        # If multiple files are present, batch-summarize them in one LLM call to save repeated token overhead.
+        if len(files) > 1:
             try:
-                lab_results[report_name] = summarize_lab_report(file_path)
+                # Build a concatenated text with filename markers so the LLM can return per-file summaries
+                combined_parts = []
+                for report_name, file_path in files.items():
+                    text = extract_text_from_pdf(file_path)
+                    combined_parts.append(f"===REPORT:{report_name}===\n{text}\n")
+                combined_text = "\n\n".join(combined_parts)
+                chain = lab_prompt | lab_report_llm
+                # Ask the LLM to return a JSON mapping {"report_name": {"summary": "..."}, ...}
+                prompt_input = {"report_text": combined_text}
+                response = chain.invoke(prompt_input)
+                raw = response.content
+                # Attempt to parse JSON from LLM output; fall back to per-file summarize if parsing fails
+                try:
+                    parsed = json.loads(raw)
+                    # Expecting dict-like mapping
+                    if isinstance(parsed, dict):
+                        lab_results = parsed
+                    else:
+                        raise ValueError("Parsed response not a dict")
+                except Exception:
+                    # Parsing failed — fallback to per-file summarization
+                    lab_results = {}
+                    for report_name, file_path in files.items():
+                        try:
+                            lab_results[report_name] = summarize_lab_report(file_path)
+                        except Exception as e:
+                            lab_results[report_name] = {"error": str(e)}
             except Exception as e:
-                lab_results[report_name] = {"error": str(e)}
+                print(f"--- ERROR batching lab summaries: {e}. Falling back to per-file. ---")
+                lab_results = {}
+                for report_name, file_path in files.items():
+                    try:
+                        lab_results[report_name] = summarize_lab_report(file_path)
+                    except Exception as e:
+                        lab_results[report_name] = {"error": str(e)}
+        else:
+            # Single file — keep existing behavior
+            lab_results = {}
+            for report_name, file_path in files.items():
+                try:
+                    lab_results[report_name] = summarize_lab_report(file_path)
+                except Exception as e:
+                    lab_results[report_name] = {"error": str(e)}
 
     structured_input = state.get("structured_input", {}).copy()
     structured_input["lab_results"] = lab_results
@@ -304,8 +345,23 @@ def generate_question_batch(state: PatientState, interview_state: Dict[str, Any]
         return []
 
     memory_context = build_memory_context_block(interview_state)
-    conversation_history = _conversation_history_text(messages, max_messages=8)
     patient_profile_text = format_patient_profile(state.get("patient_profile"))
+
+    # Reduce conversation history size to save tokens:
+    # - If very long, summarize using the small_llm once (costs 1 call but reduces future tokens)
+    # - Otherwise, trim to the recent N turns
+    convo_len = len(messages)
+    if convo_len > 20:
+        # Summarize long history into 3-5 sentences
+        try:
+            summary = summarize_and_replace_history(summarizer_llm=small_llm, history=messages,
+                                                    summary_prompt=None)
+            conversation_history = summary
+        except Exception:
+            conversation_history = _conversation_history_text(messages, max_messages=8)
+    else:
+        # Trim to recent 8 messages by default
+        conversation_history = _conversation_history_text(messages, max_messages=8)
 
     chain = batch_question_prompt | small_llm
     llm_response = chain.invoke({

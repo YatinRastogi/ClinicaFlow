@@ -8,4 +8,5 @@ from .llm import (
     clear_llm_cache,
     trim_history_window,
     summarize_and_replace_history,
+    compact_json_for_prompt,
 )
