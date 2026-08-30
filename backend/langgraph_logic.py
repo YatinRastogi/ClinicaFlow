@@ -170,6 +170,36 @@ def _conversation_history_text(messages: List[Dict[str, Any]], max_messages: int
     )
 
 
+def summarize_and_replace_history(
+    summarizer_llm: Any,
+    history: List[Dict[str, Any]],
+    summary_prompt: Optional[str] = None,
+    max_summary_sentences: int = 5,
+) -> str:
+    """Compress a long chat history into a short clinical summary."""
+    if not history:
+        return ""
+
+    if summary_prompt is None:
+        summary_prompt = (
+            "Summarize the following patient interview transcript into 3-5 concise sentences. "
+            "Keep all clinically relevant facts: symptoms, onset, severity, duration, risk factors, "
+            "medications, past history, and any unanswered questions. Do not invent new information."
+        )
+
+    transcript = _conversation_history_text(history)
+    try:
+        response = summarizer_llm.invoke(f"{summary_prompt}\n\nTRANSCRIPT:\n{transcript}")
+        summary = getattr(response, "content", str(response)).strip()
+        if summary:
+            return summary
+    except Exception as e:
+        print(f"--- ERROR summarizing interview history: {e}. ---")
+
+    # Fallback: keep the most recent turns rather than dropping the whole history.
+    return _conversation_history_text(history, max_messages=8)
+
+
 # ---------------------------------------------------------------------------
 # Node 1: Preprocess
 # ---------------------------------------------------------------------------
