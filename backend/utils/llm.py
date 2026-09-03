@@ -176,7 +176,7 @@ def _wrap_invoke(instance, model_name: str):
 
     # Bind the wrapper as a method
     bound = types.MethodType(_invoke, instance)
-    setattr(instance, "invoke", bound)
+    object.__setattr__(instance, "invoke", bound)
 
 
 # Apply wrappers to instances
